@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { NonDrinkerStatsTable } from '../components/NonDrinkerStatsTable';
 import { RecordsTable } from '../components/RecordsTable';
 import { StatisticsTable } from '../components/StatisticsTable';
 import { VariableHistogram } from '../components/VariableHistogram';
@@ -184,6 +185,8 @@ export function LiverDataPage() {
           <RecordsTable records={records} />
 
           <StatisticsTable statisticsRows={statisticsRows} />
+
+          <NonDrinkerStatsTable />
 
           <section className="panel">
             <div className="section-heading">
