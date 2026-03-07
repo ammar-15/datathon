@@ -5,6 +5,7 @@ import type { LiverCalcFormValues, LiverCalcFormErrors } from '../types/liverCal
 type LiverCalcFormProps = {
   values: LiverCalcFormValues;
   errors: LiverCalcFormErrors;
+  submitError: string;
   loading: boolean;
   onChange: (field: keyof LiverCalcFormValues, value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
@@ -36,6 +37,7 @@ const numericFields: FieldConfig[] = [
 export function LiverCalcForm({
   values,
   errors,
+  submitError,
   loading,
   onChange,
   onSubmit,
@@ -80,6 +82,7 @@ export function LiverCalcForm({
         <button type="submit" className="calc-submit" disabled={loading}>
           {loading ? 'Calculating...' : 'Estimate Risk'}
         </button>
+        {submitError ? <p className="calc-submit-error">{submitError}</p> : null}
         <LiverCalcDisclaimer />
       </div>
     </form>

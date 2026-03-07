@@ -78,7 +78,7 @@ export function LiverCalcPage() {
   const [values, setValues] = useState<LiverCalcFormValues>(initialValues);
   const [errors, setErrors] = useState<LiverCalcFormErrors>({});
   const [loading, setLoading] = useState(false);
-  const [requestError, setRequestError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState('');
   const [result, setResult] = useState<LiverRiskResponse | null>(null);
 
   const astAltRatio = useMemo(() => {
@@ -95,15 +95,17 @@ export function LiverCalcPage() {
   function handleChange(field: keyof LiverCalcFormValues, value: string) {
     setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
-    setRequestError(null);
+    setSubmitError('');
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    setSubmitError('');
+    setResult(null);
+
     const nextErrors = validate(values);
     setErrors(nextErrors);
-    setRequestError(null);
 
     if (Object.keys(nextErrors).length > 0) {
       return;
@@ -115,8 +117,7 @@ export function LiverCalcPage() {
       const response = await runLiverCalc(payload);
       setResult(response);
     } catch (error) {
-      setResult(null);
-      setRequestError(error instanceof Error ? error.message : 'Failed to calculate risk.');
+      setSubmitError(error instanceof Error ? error.message : 'Something went wrong');
     } finally {
       setLoading(false);
     }
@@ -139,18 +140,13 @@ export function LiverCalcPage() {
         <LiverCalcForm
           values={values}
           errors={errors}
+          submitError={submitError}
           loading={loading}
           onChange={handleChange}
           onSubmit={handleSubmit}
         />
 
         <div className="calc-layout__side">
-          {requestError ? (
-            <section className="state-card state-card--error">
-              <h2>Could not calculate risk</h2>
-              <p>{requestError}</p>
-            </section>
-          ) : null}
           <LiverCalcResultCard result={result} astAltRatio={astAltRatio} />
         </div>
       </section>
