@@ -4,6 +4,7 @@ export type LiverRecord = {
   alp: number;
   alt: number;
   ast: number;
+  ast_alt_ratio: number | null;
   ggt: number;
   drinks: number;
   selector: number;
@@ -28,6 +29,7 @@ export type LiverVariableKey =
   | 'alp'
   | 'alt'
   | 'ast'
+  | 'ast_alt_ratio'
   | 'ggt'
   | 'drinks'
   | 'selector';
@@ -37,6 +39,7 @@ export const liverVariables: LiverVariableKey[] = [
   'alp',
   'alt',
   'ast',
+  'ast_alt_ratio',
   'ggt',
   'drinks',
   'selector',
@@ -47,6 +50,7 @@ export const liverLabels: Record<LiverVariableKey, string> = {
   alp: 'ALP',
   alt: 'ALT',
   ast: 'AST',
+  ast_alt_ratio: 'AST/ALT Ratio',
   ggt: 'GGT',
   drinks: 'Drinks',
   selector: 'Selector',

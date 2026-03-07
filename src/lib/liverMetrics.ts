@@ -13,12 +13,16 @@ export function formatNumber(value: number, digits = 0) {
 }
 
 export function averageOf(records: LiverRecord[], key: LiverVariableKey) {
-  if (records.length === 0) {
+  const values = records
+    .map((record) => record[key])
+    .filter((value): value is number => typeof value === 'number');
+
+  if (values.length === 0) {
     return 0;
   }
 
-  const total = records.reduce((sum, record) => sum + record[key], 0);
-  return total / records.length;
+  const total = values.reduce((sum, value) => sum + value, 0);
+  return total / values.length;
 }
 
 export function buildHistogramBins(
@@ -30,7 +34,14 @@ export function buildHistogramBins(
     return [];
   }
 
-  const values = records.map((record) => record[key]);
+  const values = records
+    .map((record) => record[key])
+    .filter((value): value is number => typeof value === 'number');
+
+  if (values.length === 0) {
+    return [];
+  }
+
   const minimum = Math.min(...values);
   const maximum = Math.max(...values);
 

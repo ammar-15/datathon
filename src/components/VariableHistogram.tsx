@@ -19,6 +19,10 @@ type VariableHistogramProps = {
 
 export function VariableHistogram({ records, variable }: VariableHistogramProps) {
   const bins = buildHistogramBins(records, variable, variable === 'selector' ? 2 : 10);
+  const emptyMessage =
+    variable === 'ast_alt_ratio'
+      ? 'AST/ALT ratio not yet calculated.'
+      : 'No data available for this chart.';
 
   return (
     <article className="chart-card">
@@ -28,7 +32,7 @@ export function VariableHistogram({ records, variable }: VariableHistogramProps)
       </div>
 
       {bins.length === 0 ? (
-        <div className="chart-card__empty">No data available for this chart.</div>
+        <div className="chart-card__empty">{emptyMessage}</div>
       ) : (
         <div className="chart-card__body">
           <ResponsiveContainer width="100%" height={240}>
@@ -36,11 +40,13 @@ export function VariableHistogram({ records, variable }: VariableHistogramProps)
               <CartesianGrid stroke="rgba(148, 163, 184, 0.14)" vertical={false} />
               <XAxis
                 dataKey="label"
+                label={{ value: liverLabels[variable], position: 'insideBottom', offset: -4, fill: '#93a4b8' }}
                 tick={{ fill: '#93a4b8', fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
               />
               <YAxis
+                label={{ value: 'Count', angle: -90, position: 'insideLeft', fill: '#93a4b8' }}
                 tick={{ fill: '#93a4b8', fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
