@@ -50,12 +50,14 @@
   --table-header: #41556d;
   --table-text: #102033;
   --table-numeric: #0f2f52;
+  --table-header-bg: rgba(226, 232, 240, 0.96);
 }
 
 :root:not([data-theme='light']) {
   --table-header: var(--text-soft);
   --table-text: var(--text-main);
   --table-numeric: #c8e1ff;
+  --table-header-bg: rgba(8, 14, 26, 0.98);
 }
 
 * {
