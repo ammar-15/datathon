@@ -47,6 +47,15 @@
   --page-background:
     radial-gradient(circle at top, rgba(14, 165, 233, 0.14), transparent 34%),
     linear-gradient(180deg, #f4f8fc 0%, #edf4fb 48%, #e6eef7 100%);
+  --table-header: #41556d;
+  --table-text: #102033;
+  --table-numeric: #0f2f52;
+}
+
+:root:not([data-theme='light']) {
+  --table-header: var(--text-soft);
+  --table-text: var(--text-main);
+  --table-numeric: #c8e1ff;
 }
 
 * {
