@@ -20,6 +20,7 @@ const columns: Array<{
   { key: 'alp', label: 'ALP', align: 'right', numeric: true },
   { key: 'alt', label: 'ALT', align: 'right', numeric: true },
   { key: 'ast', label: 'AST', align: 'right', numeric: true },
+  { key: 'ast_alt_ratio', label: 'AST/ALT Ratio', align: 'right', numeric: true },
   { key: 'ggt', label: 'GGT', align: 'right', numeric: true },
   { key: 'drinks', label: 'Drinks', align: 'right', numeric: true },
   { key: 'selector', label: 'Selector', align: 'right', numeric: true },
@@ -55,6 +56,7 @@ export function RecordsTable({ records }: RecordsTableProps) {
         record.alp,
         record.alt,
         record.ast,
+        record.ast_alt_ratio,
         record.ggt,
         record.drinks,
         record.selector,
@@ -70,6 +72,18 @@ export function RecordsTable({ records }: RecordsTableProps) {
     nextRecords.sort((left, right) => {
       const leftValue = left[sortKey];
       const rightValue = right[sortKey];
+
+      if (leftValue == null && rightValue == null) {
+        return 0;
+      }
+
+      if (leftValue == null) {
+        return sortDirection === 'asc' ? 1 : -1;
+      }
+
+      if (rightValue == null) {
+        return sortDirection === 'asc' ? -1 : 1;
+      }
 
       if (typeof leftValue === 'number' && typeof rightValue === 'number') {
         return sortDirection === 'asc' ? leftValue - rightValue : rightValue - leftValue;
@@ -218,7 +232,13 @@ export function RecordsTable({ records }: RecordsTableProps) {
                             .filter(Boolean)
                             .join(' ')}
                         >
-                          {column.key === 'drinks' ? formatNumber(record.drinks, 2) : value}
+                          {column.key === 'drinks'
+                            ? formatNumber(record.drinks, 2)
+                            : column.key === 'ast_alt_ratio'
+                              ? value == null
+                                ? 'AST/ALT ratio not yet calculated.'
+                                : formatNumber(Number(value), 2)
+                              : value}
                         </td>
                       );
                     })}

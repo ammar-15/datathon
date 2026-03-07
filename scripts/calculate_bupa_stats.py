@@ -28,7 +28,7 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
 SOURCE_TABLE = "bupa_liver_records"
 STATS_TABLE = "bupa_liver_statistics"
-NUMERIC_COLUMNS = ["mcv", "alp", "alt", "ast", "ggt", "drinks", "selector"]
+NUMERIC_COLUMNS = ["mcv", "alp", "alt", "ast", "ast_alt_ratio", "ggt", "drinks", "selector"]
 PAGE_SIZE = 1000
 
 
