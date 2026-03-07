@@ -8,6 +8,8 @@ import { liverLabels, liverVariables } from '../types/liver';
 import type { LiverRecord, LiverStatistic } from '../types/liver';
 import './LiverDataPage.css';
 
+type ThemeMode = 'dark' | 'light';
+
 function buildSelectorSplit(records: LiverRecord[]) {
   const counts = records.reduce<Record<number, number>>((accumulator, record) => {
     accumulator[record.selector] = (accumulator[record.selector] ?? 0) + 1;
@@ -33,6 +35,24 @@ export function LiverDataPage() {
   const [statisticsRows, setStatisticsRows] = useState<LiverStatistic[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [theme, setTheme] = useState<ThemeMode>('dark');
+
+  useEffect(() => {
+    const savedTheme = window.localStorage.getItem('bupa-dashboard-theme');
+    const preferredTheme =
+      savedTheme === 'light' || savedTheme === 'dark'
+        ? savedTheme
+        : window.matchMedia('(prefers-color-scheme: light)').matches
+          ? 'light'
+          : 'dark';
+
+    setTheme(preferredTheme);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    window.localStorage.setItem('bupa-dashboard-theme', theme);
+  }, [theme]);
 
   useEffect(() => {
     let active = true;
@@ -81,13 +101,29 @@ export function LiverDataPage() {
   return (
     <main className="dashboard">
       <section className="dashboard__hero">
-        <div>
-          <p className="dashboard__eyebrow">Supabase dataset dashboard</p>
-          <h1>BUPA Liver Records</h1>
-          <p className="dashboard__lede">
-            Explore the full dataset, descriptive statistics stored in Supabase, and variable
-            distributions for each measurement in one demo-ready dashboard.
-          </p>
+        <div className="dashboard__hero-row">
+          <div>
+            <p className="dashboard__eyebrow">Supabase dataset dashboard</p>
+            <h1>BUPA Liver Records</h1>
+            <p className="dashboard__lede">
+              Explore the full dataset, descriptive statistics stored in Supabase, and variable
+              distributions for each measurement in one demo-ready dashboard.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            className="theme-toggle"
+            onClick={() => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))}
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          >
+            <span className="theme-toggle__icon" aria-hidden="true">
+              {theme === 'dark' ? '☀' : '☾'}
+            </span>
+            <span className="theme-toggle__text">
+              {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+            </span>
+          </button>
         </div>
       </section>
 
