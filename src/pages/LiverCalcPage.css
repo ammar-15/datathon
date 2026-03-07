@@ -98,6 +98,12 @@
   cursor: wait;
 }
 
+.calc-submit-error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 0.92rem;
+}
+
 .calc-disclaimer {
   margin: 0;
   color: var(--text-muted);

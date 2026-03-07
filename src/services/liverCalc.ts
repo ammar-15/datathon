@@ -15,14 +15,19 @@ export async function runLiverCalc(payload: LiverRiskRequest): Promise<LiverRisk
     headers: {
       'Content-Type': 'application/json',
       apikey: supabaseAnonKey,
-      Authorization: `Bearer ${supabaseAnonKey}`,
     },
     body: JSON.stringify(payload),
   });
 
+  const data = await response.json().catch(() => null);
+
   if (!response.ok) {
-    throw new Error('Failed to run liver calculator');
+    throw new Error(
+      data && typeof data === 'object' && 'error' in data && typeof data.error === 'string'
+        ? data.error
+        : 'Failed to run liver calculator',
+    );
   }
 
-  return response.json();
+  return data as LiverRiskResponse;
 }
