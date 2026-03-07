@@ -127,6 +127,12 @@
   margin-bottom: 20px;
 }
 
+.stats-tab-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .panel--table {
   margin-bottom: 20px;
 }
@@ -148,6 +154,34 @@
   border-radius: 999px;
   background: var(--accent-soft);
   color: var(--accent);
+}
+
+.stats-tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.stats-tabs__button {
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: rgba(9, 16, 28, 0.2);
+  color: var(--text-soft);
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: border-color 140ms ease, background 140ms ease, color 140ms ease;
+}
+
+.stats-tabs__button--active {
+  background: var(--accent-soft);
+  border-color: rgba(125, 211, 252, 0.4);
+  color: var(--text-main);
+}
+
+.stats-tabs__panel {
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+  padding-top: 18px;
 }
 
 .toolbar {
