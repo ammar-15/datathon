@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { NonDrinkerStatsTable } from '../components/NonDrinkerStatsTable';
+import { NonDrinkerStatsTab } from '../components/NonDrinkerStatsTab';
 import { RecordsTable } from '../components/RecordsTable';
 import { StatisticsTable } from '../components/StatisticsTable';
 import { VariableHistogram } from '../components/VariableHistogram';
@@ -10,6 +10,7 @@ import type { LiverRecord, LiverStatistic } from '../types/liver';
 import './LiverDataPage.css';
 
 type ThemeMode = 'dark' | 'light';
+type StatsTab = 'all-stats' | 'non-drinker-stats';
 
 function buildSelectorSplit(records: LiverRecord[]) {
   const counts = records.reduce<Record<number, number>>((accumulator, record) => {
@@ -37,6 +38,7 @@ export function LiverDataPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [theme, setTheme] = useState<ThemeMode>('dark');
+  const [activeStatsTab, setActiveStatsTab] = useState<StatsTab>('all-stats');
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem('bupa-dashboard-theme');
@@ -183,10 +185,50 @@ export function LiverDataPage() {
           </section>
 
           <RecordsTable records={records} />
+          <section className="panel">
+            <div className="section-heading">
+              <div>
+                <p className="section-heading__eyebrow">Stats and results</p>
+                <h2>Statistics Outputs</h2>
+              </div>
+              <p className="section-heading__copy">
+                Switch between the full descriptive statistics and the non-drinker subgroup profile.
+              </p>
+            </div>
 
-          <StatisticsTable statisticsRows={statisticsRows} />
+            <div className="stats-tabs" role="tablist" aria-label="Statistics tabs">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeStatsTab === 'all-stats'}
+                className={`stats-tabs__button ${
+                  activeStatsTab === 'all-stats' ? 'stats-tabs__button--active' : ''
+                }`}
+                onClick={() => setActiveStatsTab('all-stats')}
+              >
+                Descriptive Stats
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeStatsTab === 'non-drinker-stats'}
+                className={`stats-tabs__button ${
+                  activeStatsTab === 'non-drinker-stats' ? 'stats-tabs__button--active' : ''
+                }`}
+                onClick={() => setActiveStatsTab('non-drinker-stats')}
+              >
+                Non-Drinker Stats
+              </button>
+            </div>
 
-          <NonDrinkerStatsTable />
+            <div className="stats-tabs__panel" role="tabpanel">
+              {activeStatsTab === 'all-stats' ? (
+                <StatisticsTable statisticsRows={statisticsRows} />
+              ) : (
+                <NonDrinkerStatsTab />
+              )}
+            </div>
+          </section>
 
           <section className="panel">
             <div className="section-heading">
