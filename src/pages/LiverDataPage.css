@@ -260,10 +260,14 @@
   position: sticky;
   top: 0;
   background: rgba(8, 14, 26, 0.98);
-  color: var(--text-soft);
+  color: var(--table-header);
   font-size: 0.82rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+}
+
+.records-table tbody td {
+  color: var(--table-text);
 }
 
 .records-table tbody tr:hover {
@@ -298,7 +302,7 @@
 
 .numeric-cell {
   font-variant-numeric: tabular-nums;
-  color: #c8e1ff;
+  color: var(--table-numeric);
 }
 
 .pagination {
