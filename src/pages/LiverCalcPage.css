@@ -33,11 +33,12 @@
 }
 
 .calc-field input,
-.calc-field select {
+.calc-field select,
+.calc-field textarea {
   width: 100%;
   border: 1px solid rgba(148, 163, 184, 0.22);
   border-radius: 14px;
-  background: rgba(9, 16, 28, 0.96);
+  background: var(--panel-strong);
   color: var(--text-main);
   padding: 0.9rem 1rem;
   outline: none;
@@ -45,9 +46,28 @@
 }
 
 .calc-field input:focus,
-.calc-field select:focus {
+.calc-field select:focus,
+.calc-field textarea:focus {
   border-color: rgba(125, 211, 252, 0.8);
   box-shadow: 0 0 0 4px rgba(125, 211, 252, 0.12);
+}
+
+.calc-field input::placeholder,
+.calc-field textarea::placeholder {
+  color: var(--text-muted);
+}
+
+:root[data-theme='light'] .calc-field input,
+:root[data-theme='light'] .calc-field select,
+:root[data-theme='light'] .calc-field textarea {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(148, 163, 184, 0.45);
+  color: #102033;
+}
+
+:root[data-theme='light'] .calc-field input::placeholder,
+:root[data-theme='light'] .calc-field textarea::placeholder {
+  color: #73839a;
 }
 
 .calc-field__error {

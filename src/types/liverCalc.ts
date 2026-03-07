@@ -1,8 +1,5 @@
-export type LiverCalcSex = 'male' | 'female' | 'other' | '';
-
 export type LiverCalcFormValues = {
   age: string;
-  sex: LiverCalcSex;
   drinks_per_day: string;
   alp: string;
   alt: string;
@@ -14,7 +11,6 @@ export type LiverCalcFormErrors = Partial<Record<keyof LiverCalcFormValues, stri
 
 export type LiverRiskRequest = {
   age: number;
-  sex: Exclude<LiverCalcSex, ''>;
   drinks_per_day: number;
   alp: number;
   alt: number;

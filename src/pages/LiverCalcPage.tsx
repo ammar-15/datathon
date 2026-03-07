@@ -5,7 +5,6 @@ import { LiverCalcResultCard } from '../components/LiverCalcResultCard';
 import { runLiverCalc } from '../services/liverCalc';
 import type {
   LiverCalcFormErrors,
-  LiverCalcSex,
   LiverCalcFormValues,
   LiverRiskRequest,
   LiverRiskResponse,
@@ -14,7 +13,6 @@ import './LiverCalcPage.css';
 
 const initialValues: LiverCalcFormValues = {
   age: '',
-  sex: '',
   drinks_per_day: '',
   alp: '',
   alt: '',
@@ -24,12 +22,7 @@ const initialValues: LiverCalcFormValues = {
 
 function validate(values: LiverCalcFormValues): LiverCalcFormErrors {
   const errors: LiverCalcFormErrors = {};
-
-  if (!values.sex) {
-    errors.sex = 'Sex is required.';
-  }
-
-  const numericFields: Array<keyof Omit<LiverCalcFormValues, 'sex'>> = [
+  const numericFields: Array<keyof LiverCalcFormValues> = [
     'age',
     'drinks_per_day',
     'alp',
@@ -73,7 +66,6 @@ function validate(values: LiverCalcFormValues): LiverCalcFormErrors {
 function toPayload(values: LiverCalcFormValues): LiverRiskRequest {
   return {
     age: Number(values.age),
-    sex: values.sex as Exclude<LiverCalcSex, ''>,
     drinks_per_day: Number(values.drinks_per_day),
     alp: Number(values.alp),
     alt: Number(values.alt),

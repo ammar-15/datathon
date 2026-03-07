@@ -40,7 +40,7 @@ export function LiverCalcForm({
   onChange,
   onSubmit,
 }: LiverCalcFormProps) {
-  function handleInputChange(event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+  function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
     onChange(event.target.name as keyof LiverCalcFormValues, event.target.value);
   }
 
@@ -57,18 +57,6 @@ export function LiverCalcForm({
       </div>
 
       <div className="calc-form__grid">
-        <label className="calc-field">
-          <span>Sex</span>
-          <select name="sex" value={values.sex} onChange={handleInputChange} aria-invalid={Boolean(errors.sex)}>
-            <option value="">Select sex</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
-          </select>
-          <small className="helper-text">Used as one input in the educational model.</small>
-          {errors.sex ? <small className="calc-field__error">{errors.sex}</small> : null}
-        </label>
-
         {numericFields.map((field) => (
           <label key={field.name} className="calc-field">
             <span>{field.label}</span>
@@ -80,6 +68,7 @@ export function LiverCalcForm({
               value={values[field.name]}
               onChange={handleInputChange}
               aria-invalid={Boolean(errors[field.name])}
+              placeholder={`Enter ${field.label}`}
             />
             <small className="helper-text">{field.helper}</small>
             {errors[field.name] ? <small className="calc-field__error">{errors[field.name]}</small> : null}
