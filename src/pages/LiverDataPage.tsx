@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { DrinksRegressionTab } from '../components/DrinksRegressionTab';
 import { NonDrinkerStatsTab } from '../components/NonDrinkerStatsTab';
 import { RecordsTable } from '../components/RecordsTable';
 import { StatisticsTable } from '../components/StatisticsTable';
@@ -10,7 +11,7 @@ import type { LiverRecord, LiverStatistic } from '../types/liver';
 import './LiverDataPage.css';
 
 type ThemeMode = 'dark' | 'light';
-type StatsTab = 'all-stats' | 'non-drinker-stats';
+type StatsTab = 'all-stats' | 'non-drinker-stats' | 'drinks-regression';
 
 function buildSelectorSplit(records: LiverRecord[]) {
   const counts = records.reduce<Record<number, number>>((accumulator, record) => {
@@ -219,13 +220,26 @@ export function LiverDataPage() {
               >
                 Non-Drinker Stats
               </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeStatsTab === 'drinks-regression'}
+                className={`stats-tabs__button ${
+                  activeStatsTab === 'drinks-regression' ? 'stats-tabs__button--active' : ''
+                }`}
+                onClick={() => setActiveStatsTab('drinks-regression')}
+              >
+                Drinks Regression
+              </button>
             </div>
 
             <div className="stats-tabs__panel" role="tabpanel">
               {activeStatsTab === 'all-stats' ? (
                 <StatisticsTable statisticsRows={statisticsRows} />
-              ) : (
+              ) : activeStatsTab === 'non-drinker-stats' ? (
                 <NonDrinkerStatsTab />
+              ) : (
+                <DrinksRegressionTab />
               )}
             </div>
           </section>
