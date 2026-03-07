@@ -259,7 +259,7 @@
 .records-table thead th {
   position: sticky;
   top: 0;
-  background: rgba(8, 14, 26, 0.98);
+  background: var(--table-header-bg);
   color: var(--table-header);
   font-size: 0.82rem;
   text-transform: uppercase;
