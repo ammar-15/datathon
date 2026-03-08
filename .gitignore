@@ -3,3 +3,8 @@
 /dist
 /build
 /.env
+/artifacts/
+/scripts/ML_PLAYBOOK.md
+
+# Markdown files (presentation materials)
+*.md
