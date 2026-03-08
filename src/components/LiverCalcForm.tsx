@@ -33,7 +33,7 @@ const numericFields: FieldConfig[] = [
   { name: 'age', label: 'Age', type: 'number', step: '1', helper: '19 to 65 years' },
   {
     name: 'drinks_per_day',
-    label: 'Drinks Per Week',
+    label: 'Drinks Per Day',
     type: 'number',
     step: '0.1',
   },
