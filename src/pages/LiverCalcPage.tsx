@@ -78,9 +78,6 @@ function toPayload(values: LiverCalcFormValues): LiverRiskRequest {
 }
 
 export function LiverCalcPage() {
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-  const supabaseFunctionsUrl = supabaseUrl ? `${supabaseUrl}/functions/v1` : '';
   const [values, setValues] = useState<LiverCalcFormValues>(initialValues);
   const [errors, setErrors] = useState<LiverCalcFormErrors>({});
   const [loading, setLoading] = useState(false);
