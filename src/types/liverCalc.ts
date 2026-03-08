@@ -19,10 +19,25 @@ export type LiverRiskRequest = {
 };
 
 export type LiverRiskResponse = {
+  id?: string;
   status?: string;
   risk_band?: 'Low' | 'Moderate' | 'High' | 'Very High' | string;
   score?: number;
+  rule_score: number;
+  ast_alt_ratio?: number;
   explanation?: string;
   ai_summary?: string;
   rejected_reason?: string;
+  guardrails: { code: string; severity: string; message: string }[];
+  score_breakdown: {
+    ggt_contribution: number;
+    ast_contribution: number;
+    alt_contribution: number;
+    alp_contribution: number;
+    ast_alt_bonus: number;
+    drinks_modifier: number;
+    age_modifier: number;
+    raw_enzyme_score: number;
+    final_score: number;
+  };
 };
