@@ -28,6 +28,11 @@ export type LiverRiskResponse = {
   explanation?: string;
   ai_summary?: string;
   rejected_reason?: string;
+  advanced_evaluation?: {
+    show: boolean;
+    severity: 'hard' | 'critical' | string;
+    message: string;
+  };
   guardrails: { code: string; severity: string; message: string }[];
   score_breakdown: {
     ggt_contribution: number;
