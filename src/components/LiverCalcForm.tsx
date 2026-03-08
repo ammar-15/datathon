@@ -1,5 +1,13 @@
 import type { ChangeEvent, FormEvent } from 'react';
 import { LiverCalcDisclaimer } from './LiverCalcDisclaimer';
+import {
+  buttonPrimary,
+  fieldLabel,
+  inputClass,
+  panelInner,
+  panelShell,
+  sectionKicker,
+} from '../lib/ui';
 import type { LiverCalcFormValues, LiverCalcFormErrors } from '../types/liverCalc';
 
 type LiverCalcFormProps = {
@@ -16,22 +24,21 @@ type FieldConfig = {
   label: string;
   type?: 'number';
   step?: string;
-  helper: string;
+  helper?: string;
 };
 
 const numericFields: FieldConfig[] = [
-  { name: 'age', label: 'Age', type: 'number', step: '1', helper: 'Allowed range: 19 to 65 years.' },
+  { name: 'age', label: 'Age', type: 'number', step: '1', helper: '19 to 65 years' },
   {
     name: 'drinks_per_day',
     label: 'Drinks Per Day',
     type: 'number',
     step: '0.1',
-    helper: 'Enter the average number of alcoholic drinks consumed per day.',
   },
-  { name: 'alp', label: 'ALP', type: 'number', step: '0.1', helper: 'Alkaline phosphatase value.' },
-  { name: 'alt', label: 'ALT', type: 'number', step: '0.1', helper: 'Alanine aminotransferase value.' },
-  { name: 'ast', label: 'AST', type: 'number', step: '0.1', helper: 'Aspartate aminotransferase value.' },
-  { name: 'ggt', label: 'GGT', type: 'number', step: '0.1', helper: 'Gamma-glutamyl transferase value.' },
+  { name: 'alp', label: 'ALP', type: 'number', step: '0.1' },
+  { name: 'alt', label: 'ALT', type: 'number', step: '0.1' },
+  { name: 'ast', label: 'AST', type: 'number', step: '0.1' },
+  { name: 'ggt', label: 'GGT', type: 'number', step: '0.1' },
 ];
 
 export function LiverCalcForm({
@@ -47,21 +54,23 @@ export function LiverCalcForm({
   }
 
   return (
-    <form className="calc-form panel" onSubmit={onSubmit} noValidate>
-      <div className="section-heading">
-        <div>
-          <p className="section-heading__eyebrow">Educational estimator</p>
-          <h2>Routine Blood Test Inputs</h2>
+    <form className={`${panelShell} ${panelInner} space-y-6`} onSubmit={onSubmit} noValidate>
+      <div className="space-y-3">
+        <p className={sectionKicker}>Calculator</p>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[var(--text-main)]">
+            Routine blood test inputs
+          </h2>
+          <p className="max-w-xl text-sm leading-6 text-[var(--text-soft)]">
+            Enter six values to estimate liver risk from routine biomarkers and alcohol intake.
+          </p>
         </div>
-        <p className="section-heading__copy">
-          Enter routine blood test values to estimate a liver risk band for educational purposes.
-        </p>
       </div>
 
-      <div className="calc-form__grid">
+      <div className="grid gap-4 sm:grid-cols-2">
         {numericFields.map((field) => (
-          <label key={field.name} className="calc-field">
-            <span>{field.label}</span>
+          <label key={field.name} className="space-y-2.5">
+            <span className={fieldLabel}>{field.label}</span>
             <input
               name={field.name}
               type={field.type}
@@ -71,18 +80,24 @@ export function LiverCalcForm({
               onChange={handleInputChange}
               aria-invalid={Boolean(errors[field.name])}
               placeholder={`Enter ${field.label}`}
+              className={inputClass}
             />
-            <small className="helper-text">{field.helper}</small>
-            {errors[field.name] ? <small className="calc-field__error">{errors[field.name]}</small> : null}
+            <div className="min-h-5">
+              {errors[field.name] ? (
+                <small className="text-sm text-[var(--danger)]">{errors[field.name]}</small>
+              ) : field.helper ? (
+                <small className="text-sm text-[var(--text-muted)]">{field.helper}</small>
+              ) : null}
+            </div>
           </label>
         ))}
       </div>
 
-      <div className="calc-form__footer">
-        <button type="submit" className="calc-submit" disabled={loading}>
+      <div className="space-y-4 border-t border-[var(--border-subtle)] pt-5">
+        <button type="submit" className={buttonPrimary} disabled={loading}>
           {loading ? 'Calculating...' : 'Estimate Risk'}
         </button>
-        {submitError ? <p className="calc-submit-error">{submitError}</p> : null}
+        {submitError ? <p className="text-sm text-[var(--danger)]">{submitError}</p> : null}
         <LiverCalcDisclaimer />
       </div>
     </form>

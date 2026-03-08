@@ -9,6 +9,7 @@ import {
   YAxis,
 } from 'recharts';
 import { buildHistogramBins } from '../lib/liverMetrics';
+import { cardTitle, panelInner, panelShell } from '../lib/ui';
 import { liverLabels } from '../types/liver';
 import type { LiverRecord, LiverVariableKey } from '../types/liver';
 
@@ -25,47 +26,51 @@ export function VariableHistogram({ records, variable }: VariableHistogramProps)
       : 'No data available for this chart.';
 
   return (
-    <article className="chart-card">
-      <div className="chart-card__header">
-        <p className="chart-card__eyebrow">Distribution</p>
-        <h3>{liverLabels[variable]}</h3>
+    <article className={`${panelShell} ${panelInner} space-y-4`}>
+      <div className="flex items-start justify-between gap-3">
+        <h3 className={cardTitle}>{liverLabels[variable]}</h3>
+        <span className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--text-muted)]">
+          Distribution
+        </span>
       </div>
 
       {bins.length === 0 ? (
-        <div className="chart-card__empty">{emptyMessage}</div>
+        <div className="grid min-h-[220px] place-items-center rounded-lg border border-dashed border-[var(--border-subtle)] text-sm text-[var(--text-soft)]">
+          {emptyMessage}
+        </div>
       ) : (
-        <div className="chart-card__body">
-          <ResponsiveContainer width="100%" height={240}>
+        <div className="h-60 w-full">
+          <ResponsiveContainer width="100%" height="100%">
             <BarChart data={bins}>
-              <CartesianGrid stroke="rgba(148, 163, 184, 0.14)" vertical={false} />
+              <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
               <XAxis
                 dataKey="label"
-                label={{ value: liverLabels[variable], position: 'insideBottom', offset: -4, fill: '#93a4b8' }}
-                tick={{ fill: '#93a4b8', fontSize: 11 }}
+                tick={{ fill: 'var(--chart-text)', fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
+                tickMargin={10}
               />
               <YAxis
-                label={{ value: 'Count', angle: -90, position: 'insideLeft', fill: '#93a4b8' }}
-                tick={{ fill: '#93a4b8', fontSize: 11 }}
+                tick={{ fill: 'var(--chart-text)', fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
+                tickMargin={10}
                 allowDecimals={false}
               />
               <Tooltip
-                cursor={{ fill: 'rgba(125, 211, 252, 0.08)' }}
+                cursor={{ fill: 'var(--table-row-hover)' }}
                 contentStyle={{
-                  background: 'rgba(8, 14, 26, 0.96)',
-                  border: '1px solid rgba(148, 163, 184, 0.18)',
-                  borderRadius: '14px',
-                  color: '#e6eef8',
+                  background: 'var(--tooltip-bg)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '12px',
+                  color: 'var(--tooltip-text)',
                 }}
               />
-              <Bar dataKey="count" radius={[8, 8, 0, 0]}>
+              <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                 {bins.map((_, index) => (
                   <Cell
                     key={`${variable}-${index}`}
-                    fill={index % 2 === 0 ? 'rgba(56, 189, 248, 0.92)' : 'rgba(45, 212, 191, 0.88)'}
+                    fill={index % 2 === 0 ? 'var(--chart-bar)' : 'var(--chart-bar-alt)'}
                   />
                 ))}
               </Bar>

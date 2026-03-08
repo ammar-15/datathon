@@ -1,5 +1,16 @@
 import { useMemo, useState } from 'react';
 import { formatNumber } from '../lib/liverMetrics';
+import {
+  buttonSecondary,
+  cardTitle,
+  cn,
+  fieldLabel,
+  inputClass,
+  panelInner,
+  panelShell,
+  sectionKicker,
+  tableWrap,
+} from '../lib/ui';
 import type { LiverRecord } from '../types/liver';
 
 type SortDirection = 'asc' | 'desc';
@@ -27,6 +38,11 @@ const columns: Array<{
 ];
 
 const PAGE_SIZE = 25;
+
+const tableHeadCell =
+  'bg-[var(--table-head)] px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--table-head-text)]';
+
+const tableBodyCell = 'border-t border-[var(--border-subtle)] px-4 py-3 text-sm text-[var(--table-text)]';
 
 export function RecordsTable({ records }: RecordsTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -136,52 +152,46 @@ export function RecordsTable({ records }: RecordsTableProps) {
   }
 
   return (
-    <section className="panel panel--table">
-      <div className="section-heading">
-        <div>
-          <p className="section-heading__eyebrow">Full dataset</p>
-          <h2>Raw Records Table</h2>
+    <section className={`${panelShell} ${panelInner} space-y-5`}>
+      <div className="flex flex-col gap-4 border-b border-[var(--border-subtle)] pb-5 lg:flex-row lg:items-end lg:justify-between">
+        <div className="space-y-2">
+          <p className={sectionKicker}>Dataset</p>
+          <h2 className={cardTitle}>Raw records</h2>
         </div>
-        <p className="section-heading__copy">
-          Browse the entire BUPA dataset with search, sorting, selector filtering, and pagination.
-        </p>
-      </div>
+        <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_180px]">
+          <label className="space-y-2">
+            <span className={fieldLabel}>Search</span>
+            <input
+              type="search"
+              value={searchTerm}
+              onChange={(event) => handleSearch(event.target.value)}
+              placeholder="Search values"
+              className={inputClass}
+            />
+          </label>
 
-      <div className="toolbar">
-        <label className="toolbar__field">
-          <span>Search records</span>
-          <input
-            type="search"
-            value={searchTerm}
-            onChange={(event) => handleSearch(event.target.value)}
-            placeholder="Search numeric values"
-          />
-          <small className="helper-text">
-            Search numeric values from records, for example 85, 92, 1, or 2.
-          </small>
-        </label>
-
-        <label className="toolbar__field toolbar__field--compact">
-          <span>Selector</span>
-          <select
-            value={selectorFilter}
-            onChange={(event) => handleSelector(event.target.value as 'all' | '1' | '2')}
-          >
-            <option value="all">All selectors</option>
-            <option value="1">Selector 1</option>
-            <option value="2">Selector 2</option>
-          </select>
-        </label>
+          <label className="space-y-2">
+            <span className={fieldLabel}>Selector</span>
+            <select
+              value={selectorFilter}
+              onChange={(event) => handleSelector(event.target.value as 'all' | '1' | '2')}
+              className={inputClass}
+            >
+              <option value="all">All</option>
+              <option value="1">Selector 1</option>
+              <option value="2">Selector 2</option>
+            </select>
+          </label>
+        </div>
       </div>
 
       {sortedRecords.length === 0 ? (
-        <div className="state-card">
-          <h3>No matching records</h3>
-          <p>Try clearing the search box or changing the selector filter.</p>
+        <div className="rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-strong)] px-4 py-5 text-sm text-[var(--text-soft)]">
+          No matching records.
         </div>
       ) : (
-        <div className="table-shell">
-          <div className="table-shell__meta">
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-[var(--text-soft)]">
             <span>{formatNumber(sortedRecords.length)} visible rows</span>
             <span>
               Page {currentPage} of {totalPages}
@@ -191,8 +201,8 @@ export function RecordsTable({ records }: RecordsTableProps) {
             </span>
           </div>
 
-          <div className="table-scroll">
-            <table className="records-table">
+          <div className={tableWrap}>
+            <table className="min-w-[920px] w-full border-collapse">
               <thead>
                 <tr>
                   {columns.map((column) => {
@@ -201,15 +211,23 @@ export function RecordsTable({ records }: RecordsTableProps) {
                     return (
                       <th
                         key={column.key}
-                        className={column.align === 'right' ? 'align-right' : undefined}
+                        className={cn(
+                          tableHeadCell,
+                          column.align === 'right' ? 'text-right' : '',
+                        )}
                       >
                         <button
                           type="button"
-                          className={`sort-button ${isActive ? 'sort-button--active' : ''}`}
+                          className={cn(
+                            'inline-flex items-center gap-2 font-inherit',
+                            isActive ? 'text-[var(--text-main)]' : 'text-inherit',
+                          )}
                           onClick={() => handleSort(column.key)}
                         >
                           {column.label}
-                          <span>{isActive ? (sortDirection === 'asc' ? '↑' : '↓') : '↕'}</span>
+                          <span aria-hidden="true">
+                            {isActive ? (sortDirection === 'asc' ? '↑' : '↓') : '↕'}
+                          </span>
                         </button>
                       </th>
                     );
@@ -218,25 +236,24 @@ export function RecordsTable({ records }: RecordsTableProps) {
               </thead>
               <tbody>
                 {paginatedRecords.map((record) => (
-                  <tr key={record.id}>
+                  <tr key={record.id} className="hover:bg-[var(--table-row-hover)]">
                     {columns.map((column) => {
                       const value = record[column.key];
 
                       return (
                         <td
                           key={column.key}
-                          className={[
-                            column.align === 'right' ? 'align-right' : '',
-                            column.numeric ? 'numeric-cell' : '',
-                          ]
-                            .filter(Boolean)
-                            .join(' ')}
+                          className={cn(
+                            tableBodyCell,
+                            column.align === 'right' ? 'text-right' : '',
+                            column.numeric ? 'tabular-nums text-[var(--table-numeric)]' : '',
+                          )}
                         >
                           {column.key === 'drinks'
                             ? formatNumber(record.drinks, 2)
                             : column.key === 'ast_alt_ratio'
                               ? value == null
-                                ? 'AST/ALT ratio not yet calculated.'
+                                ? 'Not calculated'
                                 : formatNumber(Number(value), 2)
                               : value}
                         </td>
@@ -248,27 +265,29 @@ export function RecordsTable({ records }: RecordsTableProps) {
             </table>
           </div>
 
-          <div className="pagination">
-            <button
-              type="button"
-              className="pagination__button"
-              onClick={() => setPage((current) => Math.max(1, current - 1))}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </button>
-            <span className="pagination__status">
-              Showing {(currentPage - 1) * PAGE_SIZE + 1}-{Math.min(currentPage * PAGE_SIZE, sortedRecords.length)} of{' '}
-              {sortedRecords.length}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <span className="text-sm text-[var(--text-soft)]">
+              Showing {(currentPage - 1) * PAGE_SIZE + 1}-
+              {Math.min(currentPage * PAGE_SIZE, sortedRecords.length)} of {sortedRecords.length}
             </span>
-            <button
-              type="button"
-              className="pagination__button"
-              onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                className={buttonSecondary}
+                onClick={() => setPage((current) => Math.max(1, current - 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </button>
+              <button
+                type="button"
+                className={buttonSecondary}
+                onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </button>
+            </div>
           </div>
         </div>
       )}

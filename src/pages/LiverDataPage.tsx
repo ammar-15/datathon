@@ -5,12 +5,22 @@ import { RecordsTable } from '../components/RecordsTable';
 import { StatisticsTable } from '../components/StatisticsTable';
 import { VariableHistogram } from '../components/VariableHistogram';
 import { averageOf, formatNumber } from '../lib/liverMetrics';
+import {
+  cardTitle,
+  cn,
+  pageShell,
+  panelInner,
+  panelShell,
+  sectionKicker,
+  sectionSubtitle,
+  sectionTitle,
+  stateCard,
+  tabClass,
+} from '../lib/ui';
 import { fetchLiverRecords, fetchLiverStatistics } from '../services/liverData';
 import { liverLabels, liverVariables } from '../types/liver';
 import type { LiverRecord, LiverStatistic } from '../types/liver';
-import './LiverDataPage.css';
 
-type ThemeMode = 'dark' | 'light';
 type StatsTab = 'all-stats' | 'non-drinker-stats' | 'drinks-regression';
 
 function buildSelectorSplit(records: LiverRecord[]) {
@@ -38,25 +48,7 @@ export function LiverDataPage() {
   const [statisticsRows, setStatisticsRows] = useState<LiverStatistic[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [theme, setTheme] = useState<ThemeMode>('dark');
   const [activeStatsTab, setActiveStatsTab] = useState<StatsTab>('all-stats');
-
-  useEffect(() => {
-    const savedTheme = window.localStorage.getItem('bupa-dashboard-theme');
-    const preferredTheme =
-      savedTheme === 'light' || savedTheme === 'dark'
-        ? savedTheme
-        : window.matchMedia('(prefers-color-scheme: light)').matches
-          ? 'light'
-          : 'dark';
-
-    setTheme(preferredTheme);
-  }, []);
-
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    window.localStorage.setItem('bupa-dashboard-theme', theme);
-  }, [theme]);
 
   useEffect(() => {
     let active = true;
@@ -102,138 +94,116 @@ export function LiverDataPage() {
   const averageAlt = averageOf(records, 'alt');
   const highestGgt = getHighestGgt(records);
 
+  const summaryCards = [
+    { label: 'Rows', value: formatNumber(totalCount) },
+    { label: 'Average Drinks', value: formatNumber(averageDrinks, 2) },
+    { label: 'Average GGT', value: formatNumber(averageGgt, 2) },
+    { label: 'Average ALT', value: formatNumber(averageAlt, 2) },
+    { label: 'Highest GGT', value: formatNumber(highestGgt) },
+    { label: 'Selector Split', value: selectorSplit || 'No data', compact: true },
+  ];
+
   return (
-    <main className="dashboard">
-      <section className="dashboard__hero">
-        <div className="dashboard__hero-row">
-          <div>
-            <p className="dashboard__eyebrow">Supabase dataset dashboard</p>
-            <h1>BUPA Liver Records</h1>
-            <p className="dashboard__lede">
-              Explore the full dataset, descriptive statistics stored in Supabase, and variable
-              distributions for each measurement in one demo-ready dashboard.
+    <main className={pageShell}>
+      <section className={`${panelShell} ${panelInner} space-y-3`}>
+        <div className="space-y-3">
+          <p className={sectionKicker}>Supabase Dataset</p>
+          <div className="space-y-3">
+            <h1 className={sectionTitle}>BUPA liver records dashboard</h1>
+            <p className={sectionSubtitle}>
+              Explore the dataset, descriptive statistics, and distribution views from one clinical
+              dashboard.
             </p>
           </div>
-
-          <button
-            type="button"
-            className="theme-toggle"
-            onClick={() => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))}
-            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-          >
-            <span className="theme-toggle__icon" aria-hidden="true">
-              {theme === 'dark' ? '☀' : '☾'}
-            </span>
-            <span className="theme-toggle__text">
-              {theme === 'dark' ? 'Light mode' : 'Dark mode'}
-            </span>
-          </button>
         </div>
       </section>
 
       {loading ? (
-        <section className="state-card">
-          <h2>Loading dashboard</h2>
-          <p>Fetching records, statistics, and chart data from Supabase.</p>
+        <section className={stateCard}>
+          <h2 className={cardTitle}>Loading dashboard</h2>
+          <p className="mt-2 text-sm text-[var(--text-soft)]">
+            Fetching records, statistics, and chart data.
+          </p>
         </section>
       ) : error ? (
-        <section className="state-card state-card--error">
-          <h2>Could not load dashboard</h2>
-          <p>{error}</p>
-          <p className="state-card__note">
-            Confirm the renamed columns exist, both tables are readable through RLS, and your
-            frontend env values are correct.
+        <section className={`${stateCard} border-[var(--danger-soft)] bg-[var(--danger-soft)]`}>
+          <h2 className={cardTitle}>Could not load dashboard</h2>
+          <p className="mt-2 text-sm text-[var(--danger)]">{error}</p>
+          <p className="mt-2 text-sm text-[var(--danger)]">
+            Confirm the tables are readable through RLS and the frontend env values are correct.
           </p>
         </section>
       ) : records.length === 0 ? (
-        <section className="state-card">
-          <h2>No records found in bupa_liver_records.</h2>
-          <p>Import the dataset into Supabase to view the table.</p>
+        <section className={stateCard}>
+          <h2 className={cardTitle}>No records found</h2>
+          <p className="mt-2 text-sm text-[var(--text-soft)]">
+            Import the dataset into Supabase to populate the dashboard.
+          </p>
         </section>
       ) : (
         <>
-          <section className="stats-grid" aria-label="Dataset summary">
-            <article className="stat-card">
-              <span className="stat-card__label">Total Rows</span>
-              <strong>{formatNumber(totalCount)}</strong>
-              <span className="stat-card__hint">Records currently in Supabase</span>
-            </article>
-            <article className="stat-card">
-              <span className="stat-card__label">Average Drinks</span>
-              <strong>{formatNumber(averageDrinks, 2)}</strong>
-              <span className="stat-card__hint">Half-pint equivalents per day</span>
-            </article>
-            <article className="stat-card">
-              <span className="stat-card__label">Average GGT</span>
-              <strong>{formatNumber(averageGgt, 2)}</strong>
-              <span className="stat-card__hint">Mean gamma-glutamyl transpeptidase</span>
-            </article>
-            <article className="stat-card">
-              <span className="stat-card__label">Selector Split</span>
-              <strong>{selectorSplit || 'No data'}</strong>
-              <span className="stat-card__hint">Distribution across selector classes</span>
-            </article>
-            <article className="stat-card">
-              <span className="stat-card__label">Average ALT</span>
-              <strong>{formatNumber(averageAlt, 2)}</strong>
-              <span className="stat-card__hint">Useful quick scan for enzyme levels</span>
-            </article>
-            <article className="stat-card">
-              <span className="stat-card__label">Highest GGT</span>
-              <strong>{formatNumber(highestGgt)}</strong>
-              <span className="stat-card__hint">Maximum observed GGT value</span>
-            </article>
+          <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-6" aria-label="Dataset summary">
+            {summaryCards.map((card) => (
+              <article
+                key={card.label}
+                className={`${panelShell} p-5 ${card.compact ? 'xl:col-span-2' : ''}`}
+              >
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">
+                  {card.label}
+                </p>
+                <p
+                  className={cn(
+                    'mt-4 font-semibold tracking-[-0.03em] text-[var(--text-main)]',
+                    card.compact ? 'text-base leading-7 sm:text-lg' : 'text-3xl',
+                  )}
+                >
+                  {card.value}
+                </p>
+              </article>
+            ))}
           </section>
 
           <RecordsTable records={records} />
-          <section className="panel">
-            <div className="section-heading">
-              <div>
-                <p className="section-heading__eyebrow">Stats and results</p>
-                <h2>Statistics Outputs</h2>
+
+          <section className={`${panelShell} ${panelInner} space-y-5`}>
+            <div className="flex flex-col gap-4 border-b border-[var(--border-subtle)] pb-5 lg:flex-row lg:items-end lg:justify-between">
+              <div className="space-y-2">
+                <p className={sectionKicker}>Statistics</p>
+                <h2 className={cardTitle}>Stored outputs</h2>
               </div>
-              <p className="section-heading__copy">
-                Switch between the full descriptive statistics and the non-drinker subgroup profile.
-              </p>
+
+              <div className="flex flex-wrap gap-2" role="tablist" aria-label="Statistics tabs">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeStatsTab === 'all-stats'}
+                  className={tabClass(activeStatsTab === 'all-stats')}
+                  onClick={() => setActiveStatsTab('all-stats')}
+                >
+                  Descriptive stats
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeStatsTab === 'non-drinker-stats'}
+                  className={tabClass(activeStatsTab === 'non-drinker-stats')}
+                  onClick={() => setActiveStatsTab('non-drinker-stats')}
+                >
+                  Non-drinker stats
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeStatsTab === 'drinks-regression'}
+                  className={tabClass(activeStatsTab === 'drinks-regression')}
+                  onClick={() => setActiveStatsTab('drinks-regression')}
+                >
+                  Drinks regression
+                </button>
+              </div>
             </div>
 
-            <div className="stats-tabs" role="tablist" aria-label="Statistics tabs">
-              <button
-                type="button"
-                role="tab"
-                aria-selected={activeStatsTab === 'all-stats'}
-                className={`stats-tabs__button ${
-                  activeStatsTab === 'all-stats' ? 'stats-tabs__button--active' : ''
-                }`}
-                onClick={() => setActiveStatsTab('all-stats')}
-              >
-                Descriptive Stats
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={activeStatsTab === 'non-drinker-stats'}
-                className={`stats-tabs__button ${
-                  activeStatsTab === 'non-drinker-stats' ? 'stats-tabs__button--active' : ''
-                }`}
-                onClick={() => setActiveStatsTab('non-drinker-stats')}
-              >
-                Non-Drinker Stats
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={activeStatsTab === 'drinks-regression'}
-                className={`stats-tabs__button ${
-                  activeStatsTab === 'drinks-regression' ? 'stats-tabs__button--active' : ''
-                }`}
-                onClick={() => setActiveStatsTab('drinks-regression')}
-              >
-                Drinks Regression
-              </button>
-            </div>
-
-            <div className="stats-tabs__panel" role="tabpanel">
+            <div role="tabpanel">
               {activeStatsTab === 'all-stats' ? (
                 <StatisticsTable statisticsRows={statisticsRows} />
               ) : activeStatsTab === 'non-drinker-stats' ? (
@@ -244,60 +214,82 @@ export function LiverDataPage() {
             </div>
           </section>
 
-          <section className="panel">
-            <div className="section-heading">
-              <div>
-                <p className="section-heading__eyebrow">Charts</p>
-                <h2>Variable Distributions</h2>
-              </div>
-              <p className="section-heading__copy">
-                Histogram-style charts are computed from the live Supabase records in the browser.
-              </p>
+          <section className="space-y-4">
+            <div className="space-y-2">
+              <p className={sectionKicker}>Charts</p>
+              <h2 className={cardTitle}>Variable distributions</h2>
             </div>
 
-            <div className="charts-grid">
+            <div className="grid gap-4 lg:grid-cols-2">
               {liverVariables.map((variable) => (
                 <VariableHistogram key={variable} records={records} variable={variable} />
               ))}
             </div>
           </section>
 
-          <section className="panel">
-            <div className="section-heading">
-              <div>
-                <p className="section-heading__eyebrow">Quick range view</p>
-                <h2>Min / Mean / Max Summary</h2>
-              </div>
-              <p className="section-heading__copy">
-                A compact comparison using the stored descriptive statistics table.
-              </p>
+          <section className={`${panelShell} ${panelInner} space-y-5`}>
+            <div className="space-y-2">
+              <p className={sectionKicker}>Summary</p>
+              <h2 className={cardTitle}>Min / mean / max</h2>
             </div>
 
             {statisticsRows.length === 0 ? (
-              <div className="state-card">
-                <h3>No descriptive statistics found.</h3>
-                <p>Run the statistics script to populate bupa_liver_statistics.</p>
+              <div className="rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-strong)] px-4 py-5 text-sm text-[var(--text-soft)]">
+                No descriptive statistics found.
               </div>
             ) : (
-              <div className="range-grid">
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {statisticsRows.map((row) => {
                   const span = Math.max(row.max_value - row.min_value, 1);
                   const meanOffset = ((row.mean - row.min_value) / span) * 100;
 
                   return (
-                    <article key={row.column_name} className="range-card">
-                      <div className="range-card__header">
-                        <h3>{liverLabels[row.column_name]}</h3>
-                        <span>{formatNumber(row.record_count)} rows</span>
+                    <article
+                      key={row.column_name}
+                      className="rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-strong)] p-4"
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <h3 className="text-base font-semibold tracking-[-0.02em] text-[var(--text-main)]">
+                          {liverLabels[row.column_name]}
+                        </h3>
+                        <span className="text-xs text-[var(--text-muted)]">
+                          {formatNumber(row.record_count)} rows
+                        </span>
                       </div>
-                      <div className="range-card__values">
-                        <span>{formatNumber(row.min_value, 2)}</span>
-                        <span>{formatNumber(row.mean, 2)}</span>
-                        <span>{formatNumber(row.max_value, 2)}</span>
+
+                      <div className="mt-4 grid grid-cols-3 gap-3 text-sm tabular-nums text-[var(--text-soft)]">
+                        <div>
+                          <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--text-muted)]">
+                            Min
+                          </p>
+                          <p className="mt-2 text-base text-[var(--text-main)]">
+                            {formatNumber(row.min_value, 2)}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--text-muted)]">
+                            Mean
+                          </p>
+                          <p className="mt-2 text-base text-[var(--text-main)]">
+                            {formatNumber(row.mean, 2)}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--text-muted)]">
+                            Max
+                          </p>
+                          <p className="mt-2 text-base text-[var(--text-main)]">
+                            {formatNumber(row.max_value, 2)}
+                          </p>
+                        </div>
                       </div>
-                      <div className="range-card__track">
-                        <div className="range-card__line" />
-                        <div className="range-card__marker" style={{ left: `${meanOffset}%` }} />
+
+                      <div className="relative mt-5 h-2 rounded-full bg-[var(--accent-soft)]">
+                        <div className="absolute inset-y-0 left-0 rounded-full bg-[var(--accent)]/25" />
+                        <div
+                          className="absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border-2 border-[var(--surface-elevated)] bg-[var(--accent)] shadow-[0_0_0_3px_var(--accent-soft)]"
+                          style={{ left: `calc(${meanOffset}% - 8px)` }}
+                        />
                       </div>
                     </article>
                   );

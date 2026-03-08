@@ -1,5 +1,7 @@
+import type { ReactNode } from 'react';
 import { LiverCalcDisclaimer } from './LiverCalcDisclaimer';
 import { formatNumber } from '../lib/liverMetrics';
+import { cn, panelInner, panelShell, sectionKicker } from '../lib/ui';
 import type { LiverRiskResponse } from '../types/liverCalc';
 
 type LiverCalcResultCardProps = {
@@ -7,24 +9,34 @@ type LiverCalcResultCardProps = {
   astAltRatio: number | null;
   aiSummary: string | null;
   aiLoading: boolean;
-  /** GGT value from the submitted form — used to apply critical overrides client-side */
   ggt?: number | null;
-  /** Optional override returned by the edge function (e.g. "CRITICAL" or "HIGH") */
   riskBandOverride?: string | null;
   drinksPerDay?: number | null;
 };
 
 const NL_RESOURCES = [
-  { name: 'Provincial Mental Health & Addictions Navigator', url: 'https://www.gov.nl.ca/hcs/mentalhealth-committee/mentalhealth/' },
+  {
+    name: 'Provincial Mental Health & Addictions Navigator',
+    url: 'https://www.gov.nl.ca/hcs/mentalhealth-committee/mentalhealth/',
+  },
   { name: 'Bridge The Gap', url: 'https://nl.bridgethegapp.ca' },
   { name: 'LifeWise NL', url: 'https://lifewisenl.ca' },
   { name: 'Breaking Free Recovery Support', url: 'https://www.breakingfreeonline.ca' },
-  { name: 'The Recovery Centre (Eastern Health)', url: 'https://mha.easternhealth.ca/adults/treatment-centres-and-withdrawal-management/the-recovery-centre-16/' },
+  {
+    name: 'The Recovery Centre (Eastern Health)',
+    url: 'https://mha.easternhealth.ca/adults/treatment-centres-and-withdrawal-management/the-recovery-centre-16/',
+  },
   { name: 'Guardians of Recovery', url: 'https://guardiansofrecovery.foundation' },
   { name: 'Choices for Youth', url: 'https://www.choicesforyouth.ca/health-outreach' },
   { name: 'Vida Nova Recovery Centre', url: 'https://vidanovarecovery.ca' },
-  { name: "Stella's Circle – Mental Health", url: 'https://stellascircle.ca/what-we-do/mental-health/' },
-  { name: "St. John's Status of Women – Safer Substance Use", url: 'https://sjswc.ca/safer-substance-use-program/' },
+  {
+    name: "Stella's Circle – Mental Health",
+    url: 'https://stellascircle.ca/what-we-do/mental-health/',
+  },
+  {
+    name: "St. John's Status of Women – Safer Substance Use",
+    url: 'https://sjswc.ca/safer-substance-use-program/',
+  },
 ];
 
 const CANADA_RESOURCES = [
@@ -44,14 +56,74 @@ function resolveDisplayBand(
   riskBandOverride: string | null | undefined,
   ggt: number | null | undefined,
 ): string {
-  // Edge function override takes first priority
   if (riskBandOverride) return riskBandOverride;
-  // Client-side fallback in case edge function hasn't returned yet
   if (ggt != null) {
-    if (ggt >= GGT_CRITICAL_THRESHOLD) return "CRITICAL";
-    if (ggt >= GGT_HIGH_THRESHOLD && resultBand.toLowerCase() === "low") return "HIGH";
+    if (ggt >= GGT_CRITICAL_THRESHOLD) return 'CRITICAL';
+    if (ggt >= GGT_HIGH_THRESHOLD && resultBand.toLowerCase() === 'low') return 'HIGH';
   }
   return resultBand;
+}
+
+function bandClasses(band: string) {
+  switch (band.toLowerCase()) {
+    case 'low':
+      return 'border border-emerald-500/20 bg-emerald-500/10 text-emerald-300';
+    case 'moderate':
+      return 'border border-amber-500/20 bg-amber-500/10 text-amber-300';
+    case 'high':
+      return 'border border-orange-500/20 bg-orange-500/10 text-orange-300';
+    case 'very high':
+    case 'critical':
+      return 'border border-rose-500/20 bg-rose-500/10 text-rose-300';
+    default:
+      return 'border border-[var(--border-subtle)] bg-[var(--surface-strong)] text-[var(--text-soft)]';
+  }
+}
+
+function MetricCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-strong)] p-4">
+      <dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">
+        {label}
+      </dt>
+      <dd className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-[var(--text-main)]">
+        {value}
+      </dd>
+    </div>
+  );
+}
+
+function ResultBlock({
+  title,
+  children,
+  tone = 'default',
+}: {
+  title: string;
+  children: ReactNode;
+  tone?: 'default' | 'warning';
+}) {
+  return (
+    <section
+      className={cn(
+        'space-y-2 border-t pt-5',
+        tone === 'warning'
+          ? 'border-[var(--danger-soft)] text-[var(--danger)]'
+          : 'border-[var(--border-subtle)]',
+      )}
+    >
+      <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">
+        {title}
+      </h3>
+      <div
+        className={cn(
+          'text-sm leading-7',
+          tone === 'warning' ? 'text-[var(--danger)]' : 'text-[var(--text-soft)]',
+        )}
+      >
+        {children}
+      </div>
+    </section>
+  );
 }
 
 export function LiverCalcResultCard({
@@ -65,15 +137,15 @@ export function LiverCalcResultCard({
 }: LiverCalcResultCardProps) {
   if (!result) {
     return (
-      <section className="panel calc-result calc-result--placeholder">
-        <div className="section-heading">
-          <div>
-            <p className="section-heading__eyebrow">Result</p>
-            <h2>Risk Estimate</h2>
-          </div>
+      <section className={`${panelShell} ${panelInner} space-y-4`}>
+        <div className="space-y-2">
+          <p className={sectionKicker}>Result</p>
+          <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[var(--text-main)]">
+            Risk estimate
+          </h2>
         </div>
-        <p className="calc-result__placeholder">
-          Submit the form to view a risk band, score, AST:ALT ratio, and summary response.
+        <p className="text-sm leading-6 text-[var(--text-soft)]">
+          Submit the calculator to view the score, risk band, AST:ALT ratio, and clinical summary.
         </p>
       </section>
     );
@@ -83,123 +155,142 @@ export function LiverCalcResultCard({
   const displayBand = resolveDisplayBand(rawBand, riskBandOverride, ggt);
   const isCritical = displayBand.toUpperCase() === 'CRITICAL';
   const isHigh = displayBand.toUpperCase() === 'HIGH';
-
   const score =
     result.rule_score != null && typeof result.rule_score === 'number'
       ? `${formatNumber(result.rule_score, 1)} / 100`
       : 'Unavailable';
 
   return (
-    <section className="panel calc-result">
-      <div className="section-heading">
-        <div>
-          <p className="section-heading__eyebrow">Result</p>
-          <h2>Liver Risk Estimate</h2>
+    <section className={`${panelShell} ${panelInner} space-y-5`}>
+      <div className="space-y-4 border-b border-[var(--border-subtle)] pb-5">
+        <div className="space-y-2">
+          <p className={sectionKicker}>Result</p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[var(--text-main)]">
+              Liver risk estimate
+            </h2>
+            <div
+              className={cn(
+                'inline-flex w-fit items-center rounded-lg px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.18em]',
+                bandClasses(displayBand),
+              )}
+            >
+              {displayBand}
+            </div>
+          </div>
         </div>
+
+        {(isCritical || isHigh) && (
+          <div
+            role="alert"
+            className={cn(
+              'rounded-lg border px-4 py-3 text-sm leading-6',
+              isCritical
+                ? 'border-rose-500/20 bg-rose-500/10 text-rose-200'
+                : 'border-orange-500/20 bg-orange-500/10 text-orange-200',
+            )}
+          >
+            {isCritical ? (
+              <>
+                <strong className="font-semibold">Consult a doctor promptly.</strong> Your GGT is
+                critically elevated
+                {ggt != null ? ` (${ggt} vs normal up to 85)` : ''} and may indicate a serious
+                liver condition beyond alcohol use.
+              </>
+            ) : (
+              <>
+                <strong className="font-semibold">Your GGT is significantly elevated.</strong>{' '}
+                Even if other markers appear normal, this level warrants prompt discussion with a
+                doctor.
+              </>
+            )}
+          </div>
+        )}
+
+        <dl className="grid gap-4 sm:grid-cols-2">
+          <MetricCard label="Score" value={score} />
+          <MetricCard
+            label="AST:ALT Ratio"
+            value={astAltRatio === null ? 'Unavailable' : formatNumber(astAltRatio, 2)}
+          />
+        </dl>
       </div>
-
-      <div
-        className={`calc-result__badge calc-result__badge--${displayBand.toLowerCase().replace(/\s+/g, '-')}`}
-      >
-        {displayBand}
-      </div>
-
-      {/* Urgent alert banner for critical or high-override cases */}
-      {isCritical && (
-        <div className="calc-result__alert calc-result__alert--critical" role="alert">
-          <strong>⚠ Consult a doctor promptly.</strong> Your GGT is critically elevated
-          {ggt != null ? ` (${ggt} vs normal up to 85)` : ''} and may indicate a serious
-          liver condition beyond alcohol use. Please seek medical evaluation soon — do not wait
-          for routine follow-up.
-        </div>
-      )}
-
-      {isHigh && !isCritical && (
-        <div className="calc-result__alert calc-result__alert--high" role="alert">
-          <strong>Your GGT is significantly elevated.</strong> Even if other markers appear
-          normal, this level warrants prompt discussion with a doctor.
-        </div>
-      )}
-
-      <dl className="calc-result__grid">
-        <div>
-          <dt>Score</dt>
-          <dd>{score}</dd>
-        </div>
-        <div>
-          <dt>AST:ALT Ratio</dt>
-          <dd>
-            {astAltRatio === null ? 'Unavailable' : formatNumber(astAltRatio, 2)}
-          </dd>
-        </div>
-      </dl>
 
       {result.explanation ? (
-        <div className="calc-result__block">
-          <h3>Explanation</h3>
+        <ResultBlock title="Explanation">
           <p>{result.explanation}</p>
-        </div>
+        </ResultBlock>
       ) : null}
 
-      {aiLoading && (
-        <div className="calc-result__block">
-          <h3>AI Summary</h3>
-          <p className="calc-result__loading">Generating clinical summary…</p>
-        </div>
-      )}
+      {aiLoading ? (
+        <ResultBlock title="AI Summary">
+          <p>Generating clinical summary...</p>
+        </ResultBlock>
+      ) : null}
 
-      {!aiLoading && aiSummary && (
-        <div className="calc-result__block">
-          <h3>AI Summary</h3>
+      {!aiLoading && aiSummary ? (
+        <ResultBlock title="AI Summary">
           <p>{aiSummary}</p>
-        </div>
-      )}
+        </ResultBlock>
+      ) : null}
+
+      {typeof drinksPerDay === 'number' && drinksPerDay > 7 ? (
+        <ResultBlock title="Support & Harm Reduction Resources">
+          <p>Based on your reported alcohol intake, these free resources may be useful.</p>
+
+          <div className="mt-4 space-y-4">
+            <div>
+              <p className="font-medium text-[var(--text-main)]">Newfoundland & Labrador</p>
+              <ul className="mt-2 space-y-2">
+                {NL_RESOURCES.map((resource) => (
+                  <li key={resource.name}>
+                    {resource.url ? (
+                      <a
+                        href={resource.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[var(--accent)] hover:text-[var(--accent-strong)]"
+                      >
+                        {resource.name}
+                      </a>
+                    ) : (
+                      resource.name
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <p className="font-medium text-[var(--text-main)]">Canada-Wide</p>
+              <ul className="mt-2 space-y-2">
+                {CANADA_RESOURCES.map((resource) => (
+                  <li key={resource.name}>
+                    {resource.url ? (
+                      <a
+                        href={resource.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[var(--accent)] hover:text-[var(--accent-strong)]"
+                      >
+                        {resource.name}
+                      </a>
+                    ) : (
+                      resource.name
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </ResultBlock>
+      ) : null}
 
       {result.rejected_reason ? (
-        <div className="calc-result__block calc-result__block--warning">
-          <h3>Rejected Reason</h3>
+        <ResultBlock title="Rejected Reason" tone="warning">
           <p>{result.rejected_reason}</p>
-        </div>
+        </ResultBlock>
       ) : null}
-
-      {typeof drinksPerDay === 'number' && drinksPerDay > 7 && (
-        <div className="calc-result__block calc-result__resources">
-          <h3>Support &amp; Harm Reduction Resources</h3>
-          <p className="calc-result__resources-intro">
-            Based on your reported alcohol intake, here are some free resources available to you.
-          </p>
-
-          <p className="calc-result__resources-region"><strong>Newfoundland &amp; Labrador</strong></p>
-          <ul>
-            {NL_RESOURCES.map((resource) => (
-              <li key={resource.name}>
-                {resource.url ? (
-                  <a href={resource.url} target="_blank" rel="noopener noreferrer">
-                    {resource.name}
-                  </a>
-                ) : (
-                  resource.name
-                )}
-              </li>
-            ))}
-          </ul>
-
-          <p className="calc-result__resources-region"><strong>Canada-Wide</strong></p>
-          <ul>
-            {CANADA_RESOURCES.map((resource) => (
-              <li key={resource.name}>
-                {resource.url ? (
-                  <a href={resource.url} target="_blank" rel="noopener noreferrer">
-                    {resource.name}
-                  </a>
-                ) : (
-                  resource.name
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       <LiverCalcDisclaimer compact />
     </section>

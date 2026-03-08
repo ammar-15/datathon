@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { formatNumber } from '../lib/liverMetrics';
+import { tableWrap } from '../lib/ui';
 
 type DrinksRegressionRow = {
   id: number;
@@ -62,62 +63,73 @@ export function DrinksRegressionTab() {
     };
   }, []);
 
-  return (
-    <div className="stats-tab-card">
-      <div className="section-heading">
-        <div>
-          <p className="section-heading__eyebrow">Regression results</p>
-          <h2>Regression Analysis: Drinks vs Liver Biomarkers</h2>
-        </div>
-        <p className="section-heading__copy">
-          This table summarizes the linear relationship between drinks and each biomarker using
-          regression outputs stored in <code>bupa_drinks_regression_stats</code>.
-        </p>
+  if (loading) {
+    return (
+      <div className="rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-strong)] px-4 py-5 text-sm text-[var(--text-soft)]">
+        Loading drinks regression...
       </div>
+    );
+  }
 
-      {loading ? (
-        <div className="state-card">
-          <h3>Loading drinks regression</h3>
-          <p>Fetching regression rows from Supabase.</p>
-        </div>
-      ) : error ? (
-        <div className="state-card state-card--error">
-          <h3>Could not load drinks regression</h3>
-          <p>{error}</p>
-        </div>
-      ) : rows.length === 0 ? (
-        <div className="state-card">
-          <h3>No drinks regression results found</h3>
-          <p>No rows are currently available in bupa_drinks_regression_stats.</p>
-        </div>
-      ) : (
-        <div className="table-scroll">
-          <table className="records-table records-table--stats">
-            <thead>
-              <tr>
-                <th>Variable</th>
-                <th className="align-right">Slope</th>
-                <th className="align-right">Intercept</th>
-                <th className="align-right">Correlation (r)</th>
-                <th className="align-right">R²</th>
-                <th className="align-right">Count Used</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr key={row.id}>
-                  <td>{row.variable_name}</td>
-                  <td className="align-right numeric-cell">{formatNumber(row.slope, 3)}</td>
-                  <td className="align-right numeric-cell">{formatNumber(row.intercept, 3)}</td>
-                  <td className="align-right numeric-cell">{formatNumber(row.r_value, 3)}</td>
-                  <td className="align-right numeric-cell">{formatNumber(row.r_squared, 3)}</td>
-                  <td className="align-right numeric-cell">{formatNumber(row.count_used)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+  if (error) {
+    return (
+      <div className="rounded-lg border border-[var(--danger-soft)] bg-[var(--danger-soft)] px-4 py-5 text-sm text-[var(--danger)]">
+        {error}
+      </div>
+    );
+  }
+
+  if (rows.length === 0) {
+    return (
+      <div className="rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-strong)] px-4 py-5 text-sm text-[var(--text-soft)]">
+        No drinks regression results found.
+      </div>
+    );
+  }
+
+  return (
+    <div className={tableWrap}>
+      <table className="min-w-[760px] w-full border-collapse">
+        <thead>
+          <tr>
+            <th className="bg-[var(--table-head)] px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--table-head-text)]">
+              Variable
+            </th>
+            {['Slope', 'Intercept', 'Correlation (r)', 'R²', 'Count Used'].map((label) => (
+              <th
+                key={label}
+                className="bg-[var(--table-head)] px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--table-head-text)]"
+              >
+                {label}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.id} className="hover:bg-[var(--table-row-hover)]">
+              <td className="border-t border-[var(--border-subtle)] px-4 py-3 text-sm text-[var(--table-text)]">
+                {row.variable_name}
+              </td>
+              <td className="border-t border-[var(--border-subtle)] px-4 py-3 text-right text-sm tabular-nums text-[var(--table-numeric)]">
+                {formatNumber(row.slope, 3)}
+              </td>
+              <td className="border-t border-[var(--border-subtle)] px-4 py-3 text-right text-sm tabular-nums text-[var(--table-numeric)]">
+                {formatNumber(row.intercept, 3)}
+              </td>
+              <td className="border-t border-[var(--border-subtle)] px-4 py-3 text-right text-sm tabular-nums text-[var(--table-numeric)]">
+                {formatNumber(row.r_value, 3)}
+              </td>
+              <td className="border-t border-[var(--border-subtle)] px-4 py-3 text-right text-sm tabular-nums text-[var(--table-numeric)]">
+                {formatNumber(row.r_squared, 3)}
+              </td>
+              <td className="border-t border-[var(--border-subtle)] px-4 py-3 text-right text-sm tabular-nums text-[var(--table-numeric)]">
+                {formatNumber(row.count_used)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
