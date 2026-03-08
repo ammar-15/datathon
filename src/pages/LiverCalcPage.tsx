@@ -177,37 +177,26 @@ export function LiverCalcPage() {
       const response = await runLiverCalc(formValues);
       setResult(response);
 
-      if (!supabaseFunctionsUrl || !supabaseAnonKey) {
-        throw new Error('Missing Supabase environment variables for the liver calculator.');
+      // Generate a simple AI-like summary based on the calculation
+      const summaryParts: string[] = [];
+      
+      if (response.risk_band === 'Very High') {
+        summaryParts.push('⚠️ This assessment indicates very high liver-related risk.');
+      } else if (response.risk_band === 'High') {
+        summaryParts.push('⚠️ This assessment indicates high liver-related risk.');
+      } else if (response.risk_band === 'Moderate') {
+        summaryParts.push('⚡ This assessment indicates moderate liver-related risk.');
+      } else {
+        summaryParts.push('✓ This assessment indicates low liver-related risk.');
       }
 
-      setAiLoading(true);
-      try {
-        const aiRes = await fetch(`${supabaseFunctionsUrl}/liver-ai-summary`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', apikey: supabaseAnonKey },
-          body: JSON.stringify({
-            record_id: response.id,
-            age: formValues.age,
-            drinks_per_day: formValues.drinks_per_day,
-            alp: formValues.alp,
-            alt: formValues.alt,
-            ast: formValues.ast,
-            ggt: formValues.ggt,
-            rule_score: response.rule_score,
-            risk_band: response.risk_band,
-            ast_alt_ratio: response.ast_alt_ratio,
-            explanation: response.explanation,
-            guardrails: response.guardrails ?? [],
-          }),
-        });
-        const aiData = await aiRes.json();
-        setAiSummary(aiData.ai_summary ?? null);
-      } catch {
-        setAiSummary(null);
-      } finally {
-        setAiLoading(false);
+      if (response.guardrails && response.guardrails.length > 0) {
+        summaryParts.push('Key findings: ' + response.guardrails.map(g => g.message).join(' '));
       }
+
+      summaryParts.push('This is an educational tool based on ML analysis of the BUPA liver dataset. Always consult healthcare professionals for medical decisions.');
+
+      setAiSummary(summaryParts.join(' '))
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Something went wrong');
     } finally {
