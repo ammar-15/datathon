@@ -5,9 +5,16 @@ import type { LiverRiskResponse } from '../types/liverCalc';
 type LiverCalcResultCardProps = {
   result: LiverRiskResponse | null;
   astAltRatio: number | null;
+  aiSummary: string | null;
+  aiLoading: boolean;
 };
 
-export function LiverCalcResultCard({ result, astAltRatio }: LiverCalcResultCardProps) {
+export function LiverCalcResultCard({
+  result,
+  astAltRatio,
+  aiSummary,
+  aiLoading,
+}: LiverCalcResultCardProps) {
   if (!result) {
     return (
       <section className="panel calc-result calc-result--placeholder">
@@ -25,7 +32,8 @@ export function LiverCalcResultCard({ result, astAltRatio }: LiverCalcResultCard
   }
 
   const riskBand = result.risk_band ?? 'Unavailable';
-  const score = typeof result.score === 'number' ? `${formatNumber(result.score, 1)} / 100` : 'Unavailable';
+  const score =
+    typeof result.rule_score === 'number' ? `${formatNumber(result.rule_score, 1)} / 100` : 'Unavailable';
 
   return (
     <section className="panel calc-result">
@@ -60,12 +68,19 @@ export function LiverCalcResultCard({ result, astAltRatio }: LiverCalcResultCard
         </div>
       ) : null}
 
-      {result.ai_summary ? (
+      {aiLoading && (
         <div className="calc-result__block">
           <h3>AI Summary</h3>
-          <p>{result.ai_summary}</p>
+          <p className="calc-result__loading">Generating clinical summary…</p>
         </div>
-      ) : null}
+      )}
+
+      {!aiLoading && aiSummary && (
+        <div className="calc-result__block">
+          <h3>AI Summary</h3>
+          <p>{aiSummary}</p>
+        </div>
+      )}
 
       {result.rejected_reason ? (
         <div className="calc-result__block calc-result__block--warning">

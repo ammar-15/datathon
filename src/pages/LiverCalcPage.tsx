@@ -75,11 +75,16 @@ function toPayload(values: LiverCalcFormValues): LiverRiskRequest {
 }
 
 export function LiverCalcPage() {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  const supabaseFunctionsUrl = supabaseUrl ? `${supabaseUrl}/functions/v1` : '';
   const [values, setValues] = useState<LiverCalcFormValues>(initialValues);
   const [errors, setErrors] = useState<LiverCalcFormErrors>({});
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [result, setResult] = useState<LiverRiskResponse | null>(null);
+  const [aiSummary, setAiSummary] = useState<string | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
 
   const astAltRatio = useMemo(() => {
     const alt = Number(values.alt);
@@ -103,6 +108,8 @@ export function LiverCalcPage() {
 
     setSubmitError('');
     setResult(null);
+    setAiSummary(null);
+    setAiLoading(false);
 
     const nextErrors = validate(values);
     setErrors(nextErrors);
@@ -113,11 +120,39 @@ export function LiverCalcPage() {
 
     try {
       setLoading(true);
-      const payload = toPayload(values);
-      const response = await runLiverCalc(payload);
+      const formValues = toPayload(values);
+      const response = await runLiverCalc(formValues);
       setResult(response);
+
+      if (!supabaseFunctionsUrl || !supabaseAnonKey) {
+        throw new Error('Missing Supabase environment variables for the liver calculator.');
+      }
+
+      setAiLoading(true);
+      const aiRes = await fetch(`${supabaseFunctionsUrl}/liver-ai-summary`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', apikey: supabaseAnonKey },
+        body: JSON.stringify({
+          record_id: response.id,
+          age: formValues.age,
+          drinks_per_day: formValues.drinks_per_day,
+          alp: formValues.alp,
+          alt: formValues.alt,
+          ast: formValues.ast,
+          ggt: formValues.ggt,
+          rule_score: response.rule_score,
+          risk_band: response.risk_band,
+          ast_alt_ratio: response.ast_alt_ratio,
+          explanation: response.explanation,
+          guardrails: response.guardrails ?? [],
+        }),
+      });
+      const aiData = await aiRes.json();
+      setAiSummary(aiData.ai_summary ?? null);
+      setAiLoading(false);
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Something went wrong');
+      setAiLoading(false);
     } finally {
       setLoading(false);
     }
@@ -147,7 +182,12 @@ export function LiverCalcPage() {
         />
 
         <div className="calc-layout__side">
-          <LiverCalcResultCard result={result} astAltRatio={astAltRatio} />
+          <LiverCalcResultCard
+            result={result}
+            astAltRatio={astAltRatio}
+            aiSummary={aiSummary}
+            aiLoading={aiLoading}
+          />
         </div>
       </section>
     </main>
