@@ -11,6 +11,7 @@ type LiverCalcResultCardProps = {
   aiLoading: boolean;
   ggt?: number | null;
   riskBandOverride?: string | null;
+  drinksPerDay?: number | null;
 };
 
 const NL_RESOURCES = [
@@ -133,6 +134,7 @@ export function LiverCalcResultCard({
   aiLoading,
   ggt,
   riskBandOverride,
+  drinksPerDay,
 }: LiverCalcResultCardProps) {
   if (!result) {
     return (
@@ -221,7 +223,7 @@ export function LiverCalcResultCard({
         </ResultBlock>
       ) : null}
 
-      {isHigh || isCritical ? (
+      {(isHigh || isCritical) && typeof drinksPerDay === 'number' && drinksPerDay >= 5 ? (
         <ResultBlock title="Support & Harm Reduction Resources">
           <p>Based on your result, these free support resources may be useful right away.</p>
 
