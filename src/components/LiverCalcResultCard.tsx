@@ -236,8 +236,9 @@ export function LiverCalcResultCard({
                         href={resource.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[var(--accent)] hover:text-[var(--accent-strong)]"
+                        className="inline-flex items-center gap-2 text-blue-700 underline decoration-blue-300 underline-offset-2 hover:text-blue-800"
                       >
+                        <span aria-hidden="true">🔗</span>
                         {resource.name}
                       </a>
                     ) : (
@@ -258,8 +259,9 @@ export function LiverCalcResultCard({
                         href={resource.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[var(--accent)] hover:text-[var(--accent-strong)]"
+                        className="inline-flex items-center gap-2 text-blue-700 underline decoration-blue-300 underline-offset-2 hover:text-blue-800"
                       >
+                        <span aria-hidden="true">🔗</span>
                         {resource.name}
                       </a>
                     ) : (

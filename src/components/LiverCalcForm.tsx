@@ -118,6 +118,17 @@ export function LiverCalcForm({
             https://doi.org/10.1371/journal.pone.0188574
           </a>
         </p>
+        <p className="text-sm leading-6 text-[var(--text-muted)]">
+          Dataset: UCI Machine Learning Repository. (n.d.). <em>Liver disorders</em>.{' '}
+          <a
+            href="https://archive.ics.uci.edu/dataset/60/liver+disorders"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[var(--accent)] hover:text-[var(--accent-strong)]"
+          >
+            https://archive.ics.uci.edu/dataset/60/liver+disorders
+          </a>
+        </p>
         {submitError ? <p className="text-sm text-[var(--danger)]">{submitError}</p> : null}
         <LiverCalcDisclaimer />
       </div>
