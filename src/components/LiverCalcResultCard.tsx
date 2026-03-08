@@ -221,8 +221,6 @@ export function LiverCalcResultCard({
   const displayBand = resolveDisplayBand(rawBand, riskBandOverride, ggt);
   const isCritical = displayBand.toUpperCase() === "CRITICAL";
   const isHigh = displayBand.toUpperCase() === "HIGH";
-  const isModerate = displayBand.toUpperCase() === "MODERATE";
-  const isLow = displayBand.toUpperCase() === "LOW";
   const advancedEvaluation = result.advanced_evaluation;
   const showAdvancedEvaluation =
     advancedEvaluation?.show === true &&
@@ -318,8 +316,7 @@ export function LiverCalcResultCard({
         />
       ) : null}
 
-      {(isLow || isModerate || isHigh || isCritical) &&
-      typeof drinksPerDay === "number" &&
+      {typeof drinksPerDay === "number" &&
       drinksPerDay >= 5 ? (
         <ResultBlock title="Support & Harm Reduction Resources">
           <p>
