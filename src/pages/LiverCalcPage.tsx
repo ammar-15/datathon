@@ -129,30 +129,34 @@ export function LiverCalcPage() {
       }
 
       setAiLoading(true);
-      const aiRes = await fetch(`${supabaseFunctionsUrl}/liver-ai-summary`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', apikey: supabaseAnonKey },
-        body: JSON.stringify({
-          record_id: response.id,
-          age: formValues.age,
-          drinks_per_day: formValues.drinks_per_day,
-          alp: formValues.alp,
-          alt: formValues.alt,
-          ast: formValues.ast,
-          ggt: formValues.ggt,
-          rule_score: response.rule_score,
-          risk_band: response.risk_band,
-          ast_alt_ratio: response.ast_alt_ratio,
-          explanation: response.explanation,
-          guardrails: response.guardrails ?? [],
-        }),
-      });
-      const aiData = await aiRes.json();
-      setAiSummary(aiData.ai_summary ?? null);
-      setAiLoading(false);
+      try {
+        const aiRes = await fetch(`${supabaseFunctionsUrl}/liver-ai-summary`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', apikey: supabaseAnonKey },
+          body: JSON.stringify({
+            record_id: response.id,
+            age: formValues.age,
+            drinks_per_day: formValues.drinks_per_day,
+            alp: formValues.alp,
+            alt: formValues.alt,
+            ast: formValues.ast,
+            ggt: formValues.ggt,
+            rule_score: response.rule_score,
+            risk_band: response.risk_band,
+            ast_alt_ratio: response.ast_alt_ratio,
+            explanation: response.explanation,
+            guardrails: response.guardrails ?? [],
+          }),
+        });
+        const aiData = await aiRes.json();
+        setAiSummary(aiData.ai_summary ?? null);
+      } catch {
+        setAiSummary(null);
+      } finally {
+        setAiLoading(false);
+      }
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Something went wrong');
-      setAiLoading(false);
     } finally {
       setLoading(false);
     }
