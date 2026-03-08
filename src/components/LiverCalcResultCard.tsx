@@ -73,8 +73,9 @@ function bandClasses(band: string) {
     case 'high':
       return 'border border-orange-500/20 bg-orange-500/10 text-orange-300';
     case 'very high':
+      return 'border border-red-600/20 bg-red-600/10 text-red-700';
     case 'critical':
-      return 'border border-rose-500/20 bg-rose-500/10 text-rose-300';
+      return 'border border-red-700/25 bg-red-700/10 text-red-800';
     default:
       return 'border border-[var(--border-subtle)] bg-[var(--surface-strong)] text-[var(--text-soft)]';
   }
@@ -186,8 +187,8 @@ export function LiverCalcResultCard({
             className={cn(
               'rounded-lg border px-4 py-3 text-sm leading-6',
               isCritical
-                ? 'border-rose-500/20 bg-rose-500/10 text-rose-200'
-                : 'border-orange-500/20 bg-orange-500/10 text-orange-200',
+                ? 'border-red-700/25 bg-red-700/10 text-red-900'
+                : 'border-orange-600/25 bg-orange-500/10 text-orange-900',
             )}
           >
             {isCritical ? (

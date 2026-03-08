@@ -1,6 +1,7 @@
 import type { ChangeEvent, FormEvent } from 'react';
 import { LiverCalcDisclaimer } from './LiverCalcDisclaimer';
 import {
+  buttonSecondary,
   buttonPrimary,
   fieldLabel,
   inputClass,
@@ -17,6 +18,7 @@ type LiverCalcFormProps = {
   loading: boolean;
   onChange: (field: keyof LiverCalcFormValues, value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  onReset: () => void;
 };
 
 type FieldConfig = {
@@ -48,6 +50,7 @@ export function LiverCalcForm({
   loading,
   onChange,
   onSubmit,
+  onReset,
 }: LiverCalcFormProps) {
   function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
     onChange(event.target.name as keyof LiverCalcFormValues, event.target.value);
@@ -94,9 +97,14 @@ export function LiverCalcForm({
       </div>
 
       <div className="space-y-4 border-t border-[var(--border-subtle)] pt-5">
-        <button type="submit" className={buttonPrimary} disabled={loading}>
-          {loading ? 'Calculating...' : 'Estimate Risk'}
-        </button>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <button type="submit" className={buttonPrimary} disabled={loading}>
+            {loading ? 'Calculating...' : 'Estimate Risk'}
+          </button>
+          <button type="button" className={buttonSecondary} onClick={onReset} disabled={loading}>
+            Reset
+          </button>
+        </div>
         {submitError ? <p className="text-sm text-[var(--danger)]">{submitError}</p> : null}
         <LiverCalcDisclaimer />
       </div>

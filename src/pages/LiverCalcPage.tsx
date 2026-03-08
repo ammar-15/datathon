@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useEffect } from 'react';
 import type { FormEvent } from 'react';
 import { LiverCalcForm } from '../components/LiverCalcForm';
 import { LiverCalcResultCard } from '../components/LiverCalcResultCard';
@@ -19,6 +20,8 @@ const initialValues: LiverCalcFormValues = {
   ast: '',
   ggt: '',
 };
+
+const LIVER_CALC_CACHE_KEY = 'liverscope-calc-cache';
 
 function validate(values: LiverCalcFormValues): LiverCalcFormErrors {
   const errors: LiverCalcFormErrors = {};
@@ -86,6 +89,45 @@ export function LiverCalcPage() {
   const [aiSummary, setAiSummary] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
 
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(LIVER_CALC_CACHE_KEY);
+      if (!raw) {
+        return;
+      }
+
+      const parsed = JSON.parse(raw) as {
+        values?: LiverCalcFormValues;
+        result?: LiverRiskResponse | null;
+        aiSummary?: string | null;
+      };
+
+      if (parsed.values) {
+        setValues({ ...initialValues, ...parsed.values });
+      }
+
+      if (parsed.result) {
+        setResult(parsed.result);
+      }
+
+      if (parsed.aiSummary != null) {
+        setAiSummary(parsed.aiSummary);
+      }
+    } catch {
+      window.localStorage.removeItem(LIVER_CALC_CACHE_KEY);
+    }
+  }, []);
+
+  useEffect(() => {
+    const payload = JSON.stringify({
+      values,
+      result,
+      aiSummary,
+    });
+
+    window.localStorage.setItem(LIVER_CALC_CACHE_KEY, payload);
+  }, [values, result, aiSummary]);
+
   const astAltRatio = useMemo(() => {
     const alt = Number(values.alt);
     const ast = Number(values.ast);
@@ -101,6 +143,17 @@ export function LiverCalcPage() {
     setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
     setSubmitError('');
+  }
+
+  function handleReset() {
+    setValues(initialValues);
+    setErrors({});
+    setLoading(false);
+    setSubmitError('');
+    setResult(null);
+    setAiSummary(null);
+    setAiLoading(false);
+    window.localStorage.removeItem(LIVER_CALC_CACHE_KEY);
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -183,6 +236,7 @@ export function LiverCalcPage() {
           loading={loading}
           onChange={handleChange}
           onSubmit={handleSubmit}
+          onReset={handleReset}
         />
 
         <div className="lg:sticky lg:top-24">

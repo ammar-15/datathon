@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DrinksRegressionTab } from '../components/DrinksRegressionTab';
 import { NonDrinkerStatsTab } from '../components/NonDrinkerStatsTab';
 import { RecordsTable } from '../components/RecordsTable';
@@ -22,18 +22,6 @@ import { liverLabels, liverVariables } from '../types/liver';
 import type { LiverRecord, LiverStatistic } from '../types/liver';
 
 type StatsTab = 'all-stats' | 'non-drinker-stats' | 'drinks-regression';
-
-function buildSelectorSplit(records: LiverRecord[]) {
-  const counts = records.reduce<Record<number, number>>((accumulator, record) => {
-    accumulator[record.selector] = (accumulator[record.selector] ?? 0) + 1;
-    return accumulator;
-  }, {});
-
-  return Object.entries(counts)
-    .sort(([left], [right]) => Number(left) - Number(right))
-    .map(([selector, count]) => `#${selector}: ${count}`)
-    .join(' · ');
-}
 
 function getHighestGgt(records: LiverRecord[]) {
   if (records.length === 0) {
@@ -87,7 +75,6 @@ export function LiverDataPage() {
     };
   }, []);
 
-  const selectorSplit = useMemo(() => buildSelectorSplit(records), [records]);
   const totalCount = records.length;
   const averageDrinks = averageOf(records, 'drinks');
   const averageGgt = averageOf(records, 'ggt');
@@ -100,7 +87,6 @@ export function LiverDataPage() {
     { label: 'Average GGT', value: formatNumber(averageGgt, 2) },
     { label: 'Average ALT', value: formatNumber(averageAlt, 2) },
     { label: 'Highest GGT', value: formatNumber(highestGgt) },
-    { label: 'Selector Split', value: selectorSplit || 'No data', compact: true },
   ];
 
   return (
@@ -144,18 +130,12 @@ export function LiverDataPage() {
         <>
           <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-6" aria-label="Dataset summary">
             {summaryCards.map((card) => (
-              <article
-                key={card.label}
-                className={`${panelShell} p-5 ${card.compact ? 'xl:col-span-2' : ''}`}
-              >
+              <article key={card.label} className={`${panelShell} p-5`}>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">
                   {card.label}
                 </p>
                 <p
-                  className={cn(
-                    'mt-4 font-semibold tracking-[-0.03em] text-[var(--text-main)]',
-                    card.compact ? 'text-base leading-7 sm:text-lg' : 'text-3xl',
-                  )}
+                  className={cn('mt-4 text-3xl font-semibold tracking-[-0.03em] text-[var(--text-main)]')}
                 >
                   {card.value}
                 </p>

@@ -46,7 +46,6 @@ const tableBodyCell = 'border-t border-[var(--border-subtle)] px-4 py-3 text-sm 
 
 export function RecordsTable({ records }: RecordsTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectorFilter, setSelectorFilter] = useState<'all' | '1' | '2'>('all');
   const [sortKey, setSortKey] = useState<SortKey>('id');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [page, setPage] = useState(1);
@@ -55,13 +54,6 @@ export function RecordsTable({ records }: RecordsTableProps) {
     const query = searchTerm.trim().toLowerCase();
 
     return records.filter((record) => {
-      const matchesSelector =
-        selectorFilter === 'all' || record.selector === Number(selectorFilter);
-
-      if (!matchesSelector) {
-        return false;
-      }
-
       if (!query) {
         return true;
       }
@@ -80,7 +72,7 @@ export function RecordsTable({ records }: RecordsTableProps) {
 
       return searchableValues.some((value) => String(value).toLowerCase().includes(query));
     });
-  }, [records, searchTerm, selectorFilter]);
+  }, [records, searchTerm]);
 
   const sortedRecords = useMemo(() => {
     const nextRecords = [...filteredRecords];
@@ -146,11 +138,6 @@ export function RecordsTable({ records }: RecordsTableProps) {
     setPage(1);
   }
 
-  function handleSelector(value: 'all' | '1' | '2') {
-    setSelectorFilter(value);
-    setPage(1);
-  }
-
   return (
     <section className={`${panelShell} ${panelInner} space-y-5`}>
       <div className="flex flex-col gap-4 border-b border-[var(--border-subtle)] pb-5 lg:flex-row lg:items-end lg:justify-between">
@@ -158,7 +145,7 @@ export function RecordsTable({ records }: RecordsTableProps) {
           <p className={sectionKicker}>Dataset</p>
           <h2 className={cardTitle}>Raw records</h2>
         </div>
-        <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_180px]">
+        <div className="w-full max-w-sm">
           <label className="space-y-2">
             <span className={fieldLabel}>Search</span>
             <input
@@ -168,19 +155,6 @@ export function RecordsTable({ records }: RecordsTableProps) {
               placeholder="Search values"
               className={inputClass}
             />
-          </label>
-
-          <label className="space-y-2">
-            <span className={fieldLabel}>Selector</span>
-            <select
-              value={selectorFilter}
-              onChange={(event) => handleSelector(event.target.value as 'all' | '1' | '2')}
-              className={inputClass}
-            >
-              <option value="all">All</option>
-              <option value="1">Selector 1</option>
-              <option value="2">Selector 2</option>
-            </select>
           </label>
         </div>
       </div>
@@ -219,8 +193,8 @@ export function RecordsTable({ records }: RecordsTableProps) {
                         <button
                           type="button"
                           className={cn(
-                            'inline-flex items-center gap-2 font-inherit',
-                            isActive ? 'text-[var(--text-main)]' : 'text-inherit',
+                            'inline-flex items-center gap-2 font-inherit transition hover:text-[var(--accent)]',
+                            isActive ? 'text-[var(--accent)]' : 'text-inherit',
                           )}
                           onClick={() => handleSort(column.key)}
                         >

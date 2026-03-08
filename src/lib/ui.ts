@@ -30,10 +30,10 @@ export const textareaClass =
   'w-full rounded-lg border border-[var(--input-border)] bg-[var(--input-bg)] px-3 py-2.5 text-sm text-[var(--text-main)] outline-none transition placeholder:text-[var(--text-muted)] focus:border-[var(--ring)] focus:ring-2 focus:ring-[var(--ring-soft)]';
 
 export const buttonPrimary =
-  'inline-flex h-11 items-center justify-center rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)] disabled:cursor-wait disabled:opacity-60';
+  'inline-flex h-11 items-center justify-center rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)] hover:shadow-[0_0_0_1px_var(--accent-soft)] disabled:cursor-wait disabled:opacity-60';
 
 export const buttonSecondary =
-  'inline-flex h-11 items-center justify-center rounded-lg border border-[var(--border-strong)] bg-[var(--surface-strong)] px-4 text-sm font-medium text-[var(--text-main)] transition hover:border-[var(--border-contrast)] hover:bg-[var(--surface-elevated)] disabled:cursor-not-allowed disabled:opacity-50';
+  'inline-flex h-11 items-center justify-center rounded-lg border border-[var(--border-strong)] bg-[var(--surface-strong)] px-4 text-sm font-medium text-[var(--text-main)] transition hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50';
 
 export const stateCard =
   'rounded-xl border border-[var(--border-subtle)] bg-[var(--surface)] p-6 shadow-[var(--shadow-card)]';
@@ -45,7 +45,7 @@ export function tabClass(active: boolean) {
   return cn(
     'inline-flex h-10 items-center rounded-lg border px-3.5 text-sm font-medium transition',
     active
-      ? 'border-[var(--border-contrast)] bg-[var(--surface-strong)] text-[var(--text-main)]'
-      : 'border-transparent text-[var(--text-soft)] hover:border-[var(--border-subtle)] hover:bg-[var(--surface-strong)] hover:text-[var(--text-main)]',
+      ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]'
+      : 'border-transparent text-[var(--text-soft)] hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] hover:text-[var(--accent)]',
   );
 }
