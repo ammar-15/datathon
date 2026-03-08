@@ -33,7 +33,9 @@ export function LiverCalcResultCard({
 
   const riskBand = result.risk_band ?? 'Unavailable';
   const score =
-    typeof result.rule_score === 'number' ? `${formatNumber(result.rule_score, 1)} / 100` : 'Unavailable';
+    result.rule_score != null && typeof result.rule_score === 'number'
+      ? `${formatNumber(result.rule_score, 1)} / 100`
+      : 'Unavailable';
 
   return (
     <section className="panel calc-result">
