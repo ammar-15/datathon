@@ -11,7 +11,30 @@ type LiverCalcResultCardProps = {
   ggt?: number | null;
   /** Optional override returned by the edge function (e.g. "CRITICAL" or "HIGH") */
   riskBandOverride?: string | null;
+  drinksPerDay?: number | null;
 };
+
+const NL_RESOURCES = [
+  { name: 'Provincial Mental Health & Addictions Navigator', url: 'https://www.gov.nl.ca/hcs/mentalhealth-committee/mentalhealth/' },
+  { name: 'Bridge The Gap', url: 'https://nl.bridgethegapp.ca' },
+  { name: 'LifeWise NL', url: 'https://lifewisenl.ca' },
+  { name: 'Breaking Free Recovery Support', url: 'https://www.breakingfreeonline.ca' },
+  { name: 'The Recovery Centre (Eastern Health)', url: 'https://mha.easternhealth.ca/adults/treatment-centres-and-withdrawal-management/the-recovery-centre-16/' },
+  { name: 'Guardians of Recovery', url: 'https://guardiansofrecovery.foundation' },
+  { name: 'Choices for Youth', url: 'https://www.choicesforyouth.ca/health-outreach' },
+  { name: 'Vida Nova Recovery Centre', url: 'https://vidanovarecovery.ca' },
+  { name: "Stella's Circle – Mental Health", url: 'https://stellascircle.ca/what-we-do/mental-health/' },
+  { name: "St. John's Status of Women – Safer Substance Use", url: 'https://sjswc.ca/safer-substance-use-program/' },
+];
+
+const CANADA_RESOURCES = [
+  { name: 'Drug Rehab Services', url: 'https://www.drugrehab.ca' },
+  { name: 'Community Addictions Peer Support (CAPSA)', url: 'https://capsa.ca/peer-support/' },
+  { name: 'Alcoholics Anonymous Canada', url: 'https://www.aa.org' },
+  { name: 'SMART Recovery Canada', url: 'https://smartrecovery-canada.ca' },
+  { name: 'Quit Coach – Call 1-866-366-3667', url: null },
+  { name: 'Finch Self Care App', url: 'https://finchcare.com' },
+];
 
 const GGT_CRITICAL_THRESHOLD = 400;
 const GGT_HIGH_THRESHOLD = 150;
@@ -38,6 +61,7 @@ export function LiverCalcResultCard({
   aiLoading,
   ggt,
   riskBandOverride,
+  drinksPerDay,
 }: LiverCalcResultCardProps) {
   if (!result) {
     return (
@@ -137,6 +161,45 @@ export function LiverCalcResultCard({
           <p>{result.rejected_reason}</p>
         </div>
       ) : null}
+
+      {typeof drinksPerDay === 'number' && drinksPerDay > 7 && (
+        <div className="calc-result__block calc-result__resources">
+          <h3>Support &amp; Harm Reduction Resources</h3>
+          <p className="calc-result__resources-intro">
+            Based on your reported alcohol intake, here are some free resources available to you.
+          </p>
+
+          <p className="calc-result__resources-region"><strong>Newfoundland &amp; Labrador</strong></p>
+          <ul>
+            {NL_RESOURCES.map((resource) => (
+              <li key={resource.name}>
+                {resource.url ? (
+                  <a href={resource.url} target="_blank" rel="noopener noreferrer">
+                    {resource.name}
+                  </a>
+                ) : (
+                  resource.name
+                )}
+              </li>
+            ))}
+          </ul>
+
+          <p className="calc-result__resources-region"><strong>Canada-Wide</strong></p>
+          <ul>
+            {CANADA_RESOURCES.map((resource) => (
+              <li key={resource.name}>
+                {resource.url ? (
+                  <a href={resource.url} target="_blank" rel="noopener noreferrer">
+                    {resource.name}
+                  </a>
+                ) : (
+                  resource.name
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <LiverCalcDisclaimer compact />
     </section>

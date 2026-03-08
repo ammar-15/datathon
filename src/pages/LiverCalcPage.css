@@ -197,6 +197,32 @@
   background: rgba(127, 29, 29, 0.15);
 }
 
+.calc-result__resources {
+  margin-top: 20px;
+  padding-top: 4px;
+}
+
+.calc-result__resources-intro {
+  margin-bottom: 12px;
+}
+
+.calc-result__resources-region {
+  margin: 16px 0 8px;
+}
+
+.calc-result__resources ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.calc-result__resources li + li {
+  margin-top: 6px;
+}
+
+.calc-result__resources a {
+  color: var(--accent);
+}
+
 @media (max-width: 980px) {
   .calc-layout {
     grid-template-columns: 1fr;

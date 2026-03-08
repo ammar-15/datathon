@@ -191,6 +191,7 @@ export function LiverCalcPage() {
             astAltRatio={astAltRatio}
             aiSummary={aiSummary}
             aiLoading={aiLoading}
+            drinksPerDay={result ? Number(values.drinks_per_day) : null}
           />
         </div>
       </section>
