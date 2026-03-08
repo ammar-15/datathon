@@ -246,7 +246,6 @@ export function LiverCalcPage() {
             aiSummary={aiSummary}
             aiLoading={aiLoading}
             ggt={result ? Number(values.ggt) : null}
-            drinksPerDay={result ? Number(values.drinks_per_day) : null}
           />
         </div>
       </section>

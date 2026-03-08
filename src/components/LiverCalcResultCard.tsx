@@ -11,7 +11,6 @@ type LiverCalcResultCardProps = {
   aiLoading: boolean;
   ggt?: number | null;
   riskBandOverride?: string | null;
-  drinksPerDay?: number | null;
 };
 
 const NL_RESOURCES = [
@@ -134,7 +133,6 @@ export function LiverCalcResultCard({
   aiLoading,
   ggt,
   riskBandOverride,
-  drinksPerDay,
 }: LiverCalcResultCardProps) {
   if (!result) {
     return (
@@ -223,21 +221,9 @@ export function LiverCalcResultCard({
         </ResultBlock>
       ) : null}
 
-      {aiLoading ? (
-        <ResultBlock title="AI Summary">
-          <p>Generating clinical summary...</p>
-        </ResultBlock>
-      ) : null}
-
-      {!aiLoading && aiSummary ? (
-        <ResultBlock title="AI Summary">
-          <p>{aiSummary}</p>
-        </ResultBlock>
-      ) : null}
-
-      {typeof drinksPerDay === 'number' && drinksPerDay > 7 ? (
+      {isHigh || isCritical ? (
         <ResultBlock title="Support & Harm Reduction Resources">
-          <p>Based on your reported alcohol intake, these free resources may be useful.</p>
+          <p>Based on your result, these free support resources may be useful right away.</p>
 
           <div className="mt-4 space-y-4">
             <div>
@@ -284,6 +270,18 @@ export function LiverCalcResultCard({
               </ul>
             </div>
           </div>
+        </ResultBlock>
+      ) : null}
+
+      {aiLoading ? (
+        <ResultBlock title="AI Summary">
+          <p>Generating clinical summary...</p>
+        </ResultBlock>
+      ) : null}
+
+      {!aiLoading && aiSummary ? (
+        <ResultBlock title="AI Summary">
+          <p>{aiSummary}</p>
         </ResultBlock>
       ) : null}
 

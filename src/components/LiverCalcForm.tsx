@@ -105,6 +105,19 @@ export function LiverCalcForm({
             Reset
           </button>
         </div>
+        <p className="text-sm leading-6 text-[var(--text-muted)]">
+          Source: Niemela, O., Niemela, M., Bloigu, R., Aalto, M., & Laatikainen, T. (2017).
+          <em> Where should the safe limits of alcohol consumption stand in light of liver enzyme abnormalities in alcohol consumers?</em>{' '}
+          <span className="italic">PLOS ONE, 12</span>(12), e0188574.{' '}
+          <a
+            href="https://doi.org/10.1371/journal.pone.0188574"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[var(--accent)] hover:text-[var(--accent-strong)]"
+          >
+            https://doi.org/10.1371/journal.pone.0188574
+          </a>
+        </p>
         {submitError ? <p className="text-sm text-[var(--danger)]">{submitError}</p> : null}
         <LiverCalcDisclaimer />
       </div>
