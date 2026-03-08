@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "ml:train": "../.venv/bin/python scripts/train_bupa_models.py --source csv --dedupe",
+    "ml:train:supabase": "../.venv/bin/python scripts/train_bupa_models.py --source supabase --dedupe"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.54.0",
